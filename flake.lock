@@ -1,5 +1,24 @@
 {
   "nodes": {
+    "hdzero-goggle-buildroot": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1681961625,
+        "narHash": "sha256-7RiSxYigCPGimJb4Eb/EbldkeU+wNyNsn+favW3FXF0=",
+        "ref": "refs/heads/master",
+        "rev": "f85f98fb073919abc66abcb8792d53583a880f8c",
+        "shallow": true,
+        "submodules": true,
+        "type": "git",
+        "url": "https://github.com/bkleiner/hdzero-goggle-buildroot"
+      },
+      "original": {
+        "shallow": true,
+        "submodules": true,
+        "type": "git",
+        "url": "https://github.com/bkleiner/hdzero-goggle-buildroot"
+      }
+    },
     "nix-filter": {
       "locked": {
         "lastModified": 1731533336,
@@ -33,6 +52,7 @@
     },
     "root": {
       "inputs": {
+        "hdzero-goggle-buildroot": "hdzero-goggle-buildroot",
         "nix-filter": "nix-filter",
         "nixpkgs": "nixpkgs"
       }
