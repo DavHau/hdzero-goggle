@@ -1,21 +1,42 @@
 {
   stdenv,
   dos2unix,
+  e2tools,
   genimage,
   util-linux,
+  runCommand,
+  dtc,
 
   # from this project
   os-images,
+  goggle-app,
   hdzero-goggle-tools,
   hdzero-goggle-buildroot,
+  kernel,
+  rootfs,
 }:
+let
+  # dtbDir = "${os-images}/images";
+  # appExt2File = "${os-images}/images/app.ext2";
+  # rootfsExt2File = "${os-images}/images/rootfs.ext2";
+  # uImage = "${os-images}/images/uImage";
+
+  dtbDir = runCommand "hdzero-dtb" {} ''
+    mkdir $out
+    ${dtc}/bin/dtc -o $out/hdzero_goggle.dtb -O dtb ${./hdzero_goggle.dts}
+  '';
+  appExt2File = "${goggle-app}/app.ext2";
+  rootfsExt2File = "${rootfs}/rootfs.ext2";
+  uImage = "${kernel}/uImage";
+in
 stdenv.mkDerivation {
-  name = "hdzero-goggle-tools";
+  name = "hdzero-goggle-sdcard";
   dontUnpack = true;
   dontConfigure = true;
   dontFixup = true;
   nativeBuildInputs = [
     dos2unix
+    e2tools
     genimage
     hdzero-goggle-tools
     util-linux
@@ -25,10 +46,16 @@ stdenv.mkDerivation {
     COMMON_BOARD_DIR="${hdzero-goggle-buildroot}/board/hdzgoggle_common"
     source $COMMON_BOARD_DIR/functions.sh
 
-    # pushd $BINARIES_DIR
-
     cp -v $BOARD_DIR/image/{boot0,u-boot}.fex .
-    cp -v ${os-images}/images/{uImage,rootfs.ext2,app.ext2,hdzero_goggle.dtb} .
+    cp -v ${rootfsExt2File} .
+    cp -v ${appExt2File} .
+    cp -v ${uImage} .
+    cp -v "${dtbDir}/hdzero_goggle.dtb" .
+
+    chmod +w app.ext2
+    e2cp ${./setting.ini} app.ext2:/setting.ini
+    # e2rm app.ext2:/app/HDZGOGGLE
+    # e2cp ${goggle-app}/HDZGOGGLE app.ext2:/app/HDZGOGGLE
 
     u_boot_env_gen $BOARD_DIR/env.cfg env.fex
 
@@ -68,7 +95,7 @@ stdenv.mkDerivation {
     script mbr.fex
     update_mbr mbr.bin 1 mbr.fex
 
-    cp -r $COMMON_BOARD_DIR/image/{optee,scp,soc-cfg}.fex .
+    cp -vr $COMMON_BOARD_DIR/image/{optee,scp,soc-cfg}.fex .
     dragonsecboot -pack "$COMMON_BOARD_DIR/boot_package.cfg"
 
     BUILD_DIR="$PWD" \
@@ -77,5 +104,6 @@ stdenv.mkDerivation {
   installPhase = ''
     mkdir -p $out
     cp sdcard.img $out/
+    cp app.ext2 $out/
   '';
 }

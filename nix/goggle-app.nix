@@ -4,6 +4,7 @@
   lib,
   mtdutils,
   stdenv,
+  e2fsprogs,
 
   # defined by this project
   hdzero-goggle-src,
@@ -23,7 +24,7 @@ stdenv.mkDerivation {
   postPatch = ''
     substituteInPlace ./mkapp/mkapp_ota.sh \
       --replace-fail "APP_VERSION=\$(get_app_version)" "APP_VERSION=${version}"
-    patchShebangs ./mkapp
+    patchShebangs ./mkapp/mkapp_ota.sh
   '';
   dontConfigure = true;
   dontInstall = true;
@@ -31,12 +32,17 @@ stdenv.mkDerivation {
   nativeBuildInputs = [
     cmake
     mtdutils
+    e2fsprogs
   ];
   buildPhase = ''
     mkdir build
     cmake . -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=${toolchain}/share/buildroot/toolchainfile.cmake -Bbuild
     cd build
     make all -j$NIX_BUILD_CORES
-    mv ../out $out
+    cd ..
+    mkfs.ext4 -d ./mkapp/app app.ext2 "100M"
+    mv ./out $out
+    mv app.ext2 $out/
+    fsck.ext4 -y $out/app.ext2
   '';
 }

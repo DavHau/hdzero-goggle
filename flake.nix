@@ -5,20 +5,24 @@
 {
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+    nixpkgs_22_05.url = "github:nixos/nixpkgs/nixos-22.05";
     nix-filter.url = "github:numtide/nix-filter";
     hdzero-goggle-buildroot.url = "git+https://github.com/bkleiner/hdzero-goggle-buildroot?shallow=1&submodules=1";
     hdzero-goggle-buildroot.flake = false;  # this input doesn't contain a flake.nix
+    hdzero-goggle-linux-src.url = "git+https://github.com/DavHau/hdzero-goggle-linux?shallow=true&ref=hdzero";
+    hdzero-goggle-linux-src.flake = false;  # this input doesn't contain a flake.nix
   };
   outputs = {
     self,
     nixpkgs,
+    nixpkgs_22_05,
     nix-filter,
     hdzero-goggle-buildroot,
+    hdzero-goggle-linux-src,
   }: let
     # Currently can only support x86_64-linux builders, due to the hardcoded toolchain
     system = "x86_64-linux";
     pkgs = nixpkgs.legacyPackages.${system};
-
     # Source code without the nix directory and flake files to improve build caching
     hdzero-goggle-src = nix-filter.lib {
       root = ./.;
@@ -48,15 +52,34 @@
 
       # contians sdcard.img bootable image, as well as HDZ_OS.bin
       os-images = pkgs.callPackage ./nix/os-images.nix {
-        inherit hdzero-goggle-src hdzero-goggle-buildroot;
+        inherit hdzero-goggle-src hdzero-goggle-buildroot hdzero-goggle-linux-src;
         inherit (self.packages.${system}) toolchain;
+      };
+
+      # only the rootfs etx2 image
+      rootfs = pkgs.callPackage ./nix/rootfs {
+        inherit hdzero-goggle-buildroot hdzero-goggle-linux-src nix-filter;
+        inherit (self.packages.${system}) kernel toolchain;
       };
 
       hdzero-goggle-tools = pkgs.callPackage ./nix/hdzero-goggle-tools.nix {};
 
+      kernel =
+      # builtins.trace pkgsArm.stdenv.hostPlatform.linux-kernel.target
+      nixpkgs_22_05.legacyPackages.${system}.pkgsCross.armv7l-hf-multiplatform.callPackage ./nix/kernel {
+        inherit hdzero-goggle-linux-src;
+        breakpointHook = pkgs.breakpointHook;
+      };
+
       sdcard = pkgs.callPackage ./nix/sdcard {
-        inherit hdzero-goggle-buildroot;
-        inherit (self.packages.${system}) hdzero-goggle-tools os-images;
+        inherit hdzero-goggle-buildroot ;
+        inherit (self.packages.${system})
+          goggle-app
+          hdzero-goggle-tools
+          kernel
+          os-images
+          rootfs
+          ;
       };
     };
 

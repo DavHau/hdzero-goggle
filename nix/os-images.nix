@@ -24,6 +24,7 @@
   # from this project
   hdzero-goggle-src,
   hdzero-goggle-buildroot,
+  hdzero-goggle-linux-src,
   toolchain,
 }:
 let
@@ -31,26 +32,26 @@ let
     substring
     ;
   inherit (builtins) hashString;
-  hdzero-goggle-linux' = builtins.fetchurl {
-    name = "hdzero-goggle-linux.tar.gz";
-    url = "https://github.com/bkleiner/hdzero-goggle-linux/archive/1a513c43b578280d14bb0d4a74c5efd18ef3c513.tar.gz";
-    sha256 = "0fbcva4c4jy0a8i014nf79mx2bi2m7hbbdp2zir6jyp5nb42yyp6";
-  };
-  hdzero-goggle-linux-tarball = runCommand "hdzero-goggle-linux" {} ''
+  hdzero-goggle-linux-tarball = runCommand "hdzero-goggle-linux-tarball" {} ''
     mkdir -p $out
-    cp ${hdzero-goggle-linux'} $out/hdzero-goggle-linux.tar.gz
+    tar -czf $out/hdzero-goggle-linux.tar.gz -C ${hdzero-goggle-linux-src} .
+  '';
+  buildrootOverrideFile = builtins.toFile "buildroot-config-override" ''
+    LINUX_OVERRIDE_SRCDIR = ${hdzero-goggle-linux-src}
+    LINUX_HEADERS_OVERRIDE_SRCDIR = ${hdzero-goggle-linux-src}
+    HDZGOGGLE_OVERRIDE_SRCDIR = ${hdzero-goggle-src}
   '';
   os-buildroot-dl = stdenv.mkDerivation rec {
     name = let
       # append hash of buildroot to name in order to invalidate the cache if the buildroot changes
-      inputHash = substring 0 10 (hashString "sha256" "${src}${postPatch}${buildPhase}");
+      inputHash = substring 0 10 (hashString "sha256" "${src}");
     in "os-buildroot-dl-${inputHash}";
     src = hdzero-goggle-buildroot;
     dontConfigure = true;
     dontInstall = true;
     outputHashMode = "recursive";
     outputHashAlgo = "sha256";
-    outputHash = "sha256-S5Do6UtriNhfokCB1qCVK83CQHyfTc+74Gfrt5p0rbY=";
+    outputHash = "sha256-cpg8KAuVUzS5br4DYH3VM9BK8PZ4oASSFNzsSTnH+1U=";
     nativeBuildInputs = [
       which
       perl
@@ -64,6 +65,7 @@ let
       cacert
       file
     ];
+    hdzeroGoggleSrc = hdzero-goggle-src;
     postPatch = ''
       patchShebangs ./buildroot/support/{scripts,download}
       substituteInPlace ./buildroot/support/dependencies/dependencies.sh \
@@ -73,19 +75,21 @@ let
           'HDZGOGGLE_SITE = $(call github,bkleiner,hdzero-goggle,$(HDZGOGGLE_VERSION))' \
           "HDZGOGGLE_SITE = ${hdzero-goggle-src}${"\n"}HDZGOGGLE_SITE_METHOD = local"
       for defconfig in ./configs/hdzgoggle_{flash,sdcard}_defconfig; do
-        substituteInPlace $defconfig \
-          --replace-fail BR2_PACKAGE_OPENSSH=y "" \
-          --replace-fail BR2_PACKAGE_BASH=y "" \
-          --replace-fail BR2_PACKAGE_GDB_SERVER=y "" \
-          --replace-fail 'BR2_LINUX_KERNEL_CUSTOM_GIT=y' 'BR2_LINUX_KERNEL_CUSTOM_TARBALL=y' \
+        substituteInPlace "$defconfig" \
           --replace-fail \
             'BR2_LINUX_KERNEL_CUSTOM_REPO_URL="https://github.com/bkleiner/hdzero-goggle-linux.git"' \
             'BR2_LINUX_KERNEL_CUSTOM_TARBALL_LOCATION="file://${hdzero-goggle-linux-tarball}/hdzero-goggle-linux.tar.gz"' \
+          --replace-fail 'BR2_LINUX_KERNEL_CUSTOM_GIT=y' 'BR2_LINUX_KERNEL_CUSTOM_TARBALL=y' \
           --replace-fail BR2_LINUX_KERNEL_CUSTOM_REPO_VERSION= "" \
+          --replace-fail BR2_PACKAGE_OPENSSH=y "" \
+          --replace-fail BR2_PACKAGE_BASH=y "" \
+          --replace-fail BR2_PACKAGE_GDB_SERVER=y "" \
           --replace-fail BR2_TOOLCHAIN_EXTERNAL_DOWNLOAD=y BR2_TOOLCHAIN_EXTERNAL_PREINSTALLED=y \
           --replace-fail \
             'BR2_TOOLCHAIN_EXTERNAL_URL="https://toolchains.bootlin.com/downloads/releases/toolchains/armv7-eabihf/tarballs/armv7-eabihf--musl--stable-2018.02-2.tar.bz2"' \
             'BR2_TOOLCHAIN_EXTERNAL_PATH="${toolchain}"'
+
+        echo 'BR2_PACKAGE_OVERRIDE_FILE="${buildrootOverrideFile}"' >> "$defconfig"
       done
     '';
     buildPhase = ''
@@ -96,6 +100,7 @@ let
       make O=$PWD/output BR2_DL_DIR=$PWD/dl BR2_EXTERNAL=$PWD -C buildroot hdzgoggle_sdcard_defconfig
       make O=$PWD/output BR2_DL_DIR=$PWD/dl BR2_EXTERNAL=$PWD -C buildroot source -j8
       mkdir $out
+      rm -r dl/linux
       cp -r dl $out/dl
     '';
   };
