@@ -50,20 +50,24 @@
         inherit hdzero-goggle-src;
       };
 
-      # contians sdcard.img bootable image, as well as HDZ_OS.bin
+      # legacy: this is simply wrapping the full buildroot build from https://github.com/bkleiner/hdzero-goggle-buildroot
+      # better use .#sdcard output instead
+      # contains sdcard.img bootable image, as well as HDZ_OS.bin
       os-images = pkgs.callPackage ./nix/os-images.nix {
         inherit hdzero-goggle-src hdzero-goggle-buildroot hdzero-goggle-linux-src;
         inherit (self.packages.${system}) toolchain;
       };
 
-      # only the rootfs etx2 image
+      # only the rootfs etx2 image built by wrapping buildroot
       rootfs = pkgs.callPackage ./nix/rootfs {
         inherit hdzero-goggle-buildroot nix-filter;
         inherit (self.packages.${system}) kernel toolchain;
       };
 
+      # tools for creating a bootable image
       hdzero-goggle-tools = pkgs.callPackage ./nix/hdzero-goggle-tools.nix {};
 
+      # the kernel built with nix
       kernel =
       # builtins.trace pkgsArm.stdenv.hostPlatform.linux-kernel.target
       nixpkgs_22_05.legacyPackages.${system}.pkgsCross.armv7l-hf-multiplatform.callPackage ./nix/kernel {
@@ -71,13 +75,16 @@
         breakpointHook = pkgs.breakpointHook;
       };
 
+      # sdcard containing:
+      # - nix built kernel
+      # - nix built goggle app
+      # - buildroot built rootfs
       sdcard = pkgs.callPackage ./nix/sdcard {
-        inherit hdzero-goggle-buildroot ;
+        inherit hdzero-goggle-buildroot;
         inherit (self.packages.${system})
           goggle-app
           hdzero-goggle-tools
           kernel
-          os-images
           rootfs
           ;
       };

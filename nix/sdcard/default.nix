@@ -8,7 +8,6 @@
   dtc,
 
   # from this project
-  os-images,
   goggle-app,
   hdzero-goggle-tools,
   hdzero-goggle-buildroot,
@@ -59,7 +58,7 @@ stdenv.mkDerivation {
     # e2cp ''${./setting.ini} app.ext2:/setting.ini\
 
     # override the app with our own build
-    e2cp ${goggle-app}/HDZGOGGLE app.ext2:/app/HDZGOGGLE
+    e2cp -vp ${goggle-app}/HDZGOGGLE app.ext2:/app/HDZGOGGLE
 
     u_boot_env_gen $BOARD_DIR/env.cfg env.fex
 
