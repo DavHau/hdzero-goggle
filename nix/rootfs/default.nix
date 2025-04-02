@@ -27,7 +27,6 @@
 
   # from this project
   hdzero-goggle-buildroot,
-  hdzero-goggle-linux-src,
   toolchain,
   kernel,
 
@@ -35,29 +34,19 @@
   breakpointHook,
   vim,
   ripgrep,
+  pkgs,
 }:
 let
   inherit (lib)
     substring
     ;
   inherit (builtins) hashString;
-  src = nix-filter.lib {
-    root = ../../.;
-    exclude = [ "app" "nix" "flake.nix" "flake.lock" ];
-  };
   libDir = nix-filter.lib {
     root = ../../lib;
   };
-  hdzero-goggle-linux-tarball = runCommand "hdzero-goggle-linux-tarball" {} ''
-    mkdir -p $out
-    tar -czf $out/hdzero-goggle-linux.tar.gz -C ${hdzero-goggle-linux-src} .
-  '';
-  buildrootOverrideFile = builtins.toFile "buildroot-config-override" ''
-    LINUX_OVERRIDE_SRCDIR = ${hdzero-goggle-linux-src}
-    LINUX_HEADERS_OVERRIDE_SRCDIR = ${hdzero-goggle-linux-src}
-    HDZGOGGLE_OVERRIDE_SRCDIR = ${src}
-    KERNEL_HEADERS_OVERRIDE_SRCDIR = ${hdzero-goggle-linux-src}
-  '';
+  koDir = nix-filter.lib {
+    root = ../../mkapp/app/ko;
+  };
   os-buildroot-dl = stdenv.mkDerivation rec {
     name = let
       # append hash of buildroot to name in order to invalidate the cache if the buildroot changes
@@ -68,7 +57,7 @@ let
     dontInstall = true;
     outputHashMode = "recursive";
     outputHashAlgo = "sha256";
-    outputHash = "sha256-cpg8KAuVUzS5br4DYH3VM9BK8PZ4oASSFNzsSTnH+1U=";
+    outputHash = "sha256-EW2jpgrXHvlAs5m+MTYBsuHCP/2afsyogStK7QLoXO4=";
     nativeBuildInputs = [
       which
       perl
@@ -86,10 +75,6 @@ let
       patchShebangs ./buildroot/support/{scripts,download}
       substituteInPlace ./buildroot/support/dependencies/dependencies.sh \
         --replace-fail "/usr/bin/file" "$(which file)"
-      substituteInPlace ./package/hdzgoggle/hdzgoggle.mk \
-        --replace-fail \
-          'HDZGOGGLE_SITE = $(call github,bkleiner,hdzero-goggle,$(HDZGOGGLE_VERSION))' \
-          "HDZGOGGLE_SITE = ${src}${"\n"}HDZGOGGLE_SITE_METHOD = local"
       for defconfig in ./configs/hdzgoggle_*_defconfig; do
         substituteInPlace "$defconfig" \
           --replace-fail BR2_LINUX_KERNEL=y BR2_LINUX_KERNEL=n \
@@ -100,8 +85,6 @@ let
           --replace-fail \
             'BR2_TOOLCHAIN_EXTERNAL_URL="https://toolchains.bootlin.com/downloads/releases/toolchains/armv7-eabihf/tarballs/armv7-eabihf--musl--stable-2018.02-2.tar.bz2"' \
             'BR2_TOOLCHAIN_EXTERNAL_PATH="${toolchain}"'
-
-        echo 'BR2_PACKAGE_OVERRIDE_FILE="${buildrootOverrideFile}"' >> "$defconfig"
       done
     '';
     buildPhase = ''
@@ -112,7 +95,6 @@ let
       make O=$PWD/output BR2_DL_DIR=$PWD/dl BR2_EXTERNAL=$PWD -C buildroot hdzgoggle_sdcard_defconfig
       make O=$PWD/output BR2_DL_DIR=$PWD/dl BR2_EXTERNAL=$PWD -C buildroot source -j8
       mkdir $out
-      rm -r dl/linux
       cp -r dl $out/dl
     '';
   };
@@ -135,6 +117,7 @@ let
         libxcrypt
         libgcc.lib
       ];
+          # --replace-fail BR2_KERNEL_HEADERS_CUSTOM_TARBALL_LOCATION= BR2_KERNEL_HEADERS_CUSTOM_TARBALL_LOCATION=${hdzero-goggle-linux-src}
       postPatch = os-buildroot-dl.postPatch + ''
         for file in $(find ./buildroot/package/ -type f); do
           sed -i "s|/bin/true|${coreutils}/bin/true|g" $file
@@ -149,16 +132,12 @@ let
           --replace-fail BR2_TOOLCHAIN_EXTERNAL_DOWNLOAD=y BR2_TOOLCHAIN_EXTERNAL_PREINSTALLED=y \
           --replace-fail \
             'BR2_TOOLCHAIN_EXTERNAL_URL="https://toolchains.bootlin.com/downloads/releases/toolchains/armv7-eabihf/tarballs/armv7-eabihf--musl--stable-2018.02-2.tar.bz2"' \
-            'BR2_TOOLCHAIN_EXTERNAL_PATH="${toolchain}"' \
-          --replace-fail BR2_KERNEL_HEADERS_CUSTOM_TARBALL_LOCATION= BR2_KERNEL_HEADERS_CUSTOM_TARBALL_LOCATION=${hdzero-goggle-linux-src}
+            'BR2_TOOLCHAIN_EXTERNAL_PATH="${toolchain}"'
         # cat Config.in | head -n1 > Config.in.new
         # mv Config.in.new Config.in
         echo "" > Config.in
         rm -r ./package/hdzero-tools
       '';
-      # NIX_CFLAGS_COMPILE = [
-      #   "-Wno/-implicit-function-declaration"
-      # ];
       # quite hacky, but it works. calling make multiple times and patching stuff in between
       buildPhase = ''
         # populate the dl directory which was built separately
@@ -172,31 +151,25 @@ let
         # build all target until stuff fails -> then patch some stuff -> then re-run make
         make O=$PWD/output BR2_DL_DIR=$PWD/dl BR2_EXTERNAL=$PWD -C buildroot -j$NIX_BUILD_CORES --keep-going || true
 
-        # patch shebangs
+        # patch shebangs of buildroot built host tools
         patchShebangs ./output/build/host-*
-        # patch mkapp_ota.sh to include version and fix paths
-        # substituteInPlace ./output/build/hdzgoggle-main/mkapp/mkapp_ota.sh \
-        #   --replace-fail "APP_VERSION=\$(get_app_version)" "APP_VERSION=\$(cat ${src + "/VERSION"})"
-        # patchShebangs ./output/build/hdzgoggle-main/mkapp/mkapp_ota.sh
 
+        # compilation fails without ignoring this error
+        # TODO: fix this properly
         export NIX_CFLAGS_COMPILE="$NIX_CFLAGS_COMPILE -Wno-implicit-function-declaration"
 
+        # setting setuid not possible in nix sandbox
         substituteInPlace ./output/build/host-util-linux-*/Makefile \
           --replace-fail "chmod 4755" "chmod 755"
 
         # re-run build with patches/fixes from above
-        make O=$PWD/output BR2_DL_DIR=$PWD/dl BR2_EXTERNAL=$PWD -C buildroot -j$NIX_BUILD_CORES --keep-going || true
-        make O=$PWD/output BR2_DL_DIR=$PWD/dl BR2_EXTERNAL=$PWD -C buildroot -j$NIX_BUILD_CORES --keep-going || true
-
-        # continue build
-        # make O=$PWD/output BR2_DL_DIR=$PWD/dl BR2_EXTERNAL=$PWD -C buildroot -j$NIX_BUILD_CORES
+        make O=$PWD/output BR2_DL_DIR=$PWD/dl BR2_EXTERNAL=$PWD -C buildroot -j$NIX_BUILD_CORES --keep-going
 
         mkdir $out
         mv output/images/rootfs.ext2 $out/
       '';
     };
 in
-# baseFs
   runCommand "hdzero-rootfs"
     {
       nativeBuildInputs = [
@@ -210,10 +183,32 @@ in
       for lib in ${libDir}/*/lib/*; do
         e2cp "$lib" "$rootfs:/usr/lib/$(basename "$lib")"
       done
+
       pushd "${kernel}"
-      filelist=$(find lib/modules -type f)
+
+      # add kernel module from the kernel build
+      filelist=$(find lib/modules/ -type f)
       echo "$filelist" | e2cp -apv -d "$rootfs":/
+
+      # add kernel module binaries from this repo, only if they are not already present
+      for ko in ${koDir}/*.ko; do
+        location=$(find lib/modules -name "$(basename "$ko")")
+        if [ -z "$location" ]; then
+          e2cp "$ko" "$rootfs:/lib/modules/$(basename "$ko")"
+        else
+          echo "skipping $ko, already exists at $location"
+        fi
+      done
+
       popd
+
+      # add some apps
+      e2cp -vp "${pkgs.pkgsCross.armv7l-hf-multiplatform.pkgsStatic.gdb}/bin/gdb" "$rootfs:/bin/gdb"
+      e2cp -vp "${pkgs.pkgsCross.armv7l-hf-multiplatform.pkgsStatic.util-linux}/bin/dmesg" "$rootfs:/bin/dmesg"
+
+      # add vclk_phase.cfg
+      e2cp -vp "${./vclk_phase.cfg}" "$rootfs:/etc/vclk_phase.cfg"
+
       mkdir $out
       mv rootfs.ext2 $out/
     ''

@@ -58,7 +58,7 @@
 
       # only the rootfs etx2 image
       rootfs = pkgs.callPackage ./nix/rootfs {
-        inherit hdzero-goggle-buildroot hdzero-goggle-linux-src nix-filter;
+        inherit hdzero-goggle-buildroot nix-filter;
         inherit (self.packages.${system}) kernel toolchain;
       };
 
