@@ -1,0 +1,34 @@
+## kernel modules
+
+lsmod on the original os:
+
+Module                  Size  Used by
+nct75                   1486  0
+mcp3021                 1607  0
+vdpo                    9899  0
+disp                  285699  3 vdpo
+gpio_keys_hdzero        6172  0
+sunxi_wlan              7312  0
+vin_v4l2              110882  1
+hdzero                  3492  0
+vin_io                 24315  2 vin_v4l2,hdzero
+videobuf2_dma_contig     5924  1 vin_v4l2
+
+lsmod on the custom os:
+
+Module                  Size  Used by    Not tainted
+nct75                   1486  0
+mcp3021                 1607  0
+vdpo                    9899  0
+disp                  285699  4 vdpo
+rotary_encoder          3160  0
+gpio_keys_hdzero        6172  0
+sunxi_wlan              7445  0
+vin_v4l2              111486  1
+hdzero                  3492  0
+imx415_mipi             6598  0
+tp9950                  8524  0
+vin_io                 24295  4 vin_v4l2,hdzero,imx415_mipi,tp9950
+videobuf2_dma_contig     5939  1 vin_v4l2
+sunxi_ise               5846  0
+sunxi_eise              5929  0
