@@ -53,9 +53,13 @@ stdenv.mkDerivation {
     cp -v "${dtbDir}/hdzero_goggle.dtb" .
 
     chmod +w app.ext2
-    e2cp ${./setting.ini} app.ext2:/setting.ini
-    # e2rm app.ext2:/app/HDZGOGGLE
-    # e2cp ${goggle-app}/HDZGOGGLE app.ext2:/app/HDZGOGGLE
+
+    # TODO: fix this
+    # modify default settings
+    # e2cp ''${./setting.ini} app.ext2:/setting.ini\
+
+    # override the app with our own build
+    e2cp ${goggle-app}/HDZGOGGLE app.ext2:/app/HDZGOGGLE
 
     u_boot_env_gen $BOARD_DIR/env.cfg env.fex
 
