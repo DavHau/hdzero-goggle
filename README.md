@@ -1,86 +1,60 @@
-# HDZero Goggle Firmware
+# Custom HDZero Goggle Firmware
 
-## Environment Setup
+This project is a fork of [hd-zero/hdzero-goggle](https://github.com/hd-zero/hdzero-goggle)
 
-The firmware can either be built in a [devcontainer](https://containers.dev/) or natively on a linux machine.
+The motivation of this project is to build an open source based firmware, unlike the original which is largely closed.
 
-Note: decompressing the repository in Windows system may damage some files and prevent correct builds.
+The following software components have never been publicly released by hdzero:
+- the source of the custom linux kernel
+- drivers / kernel modules
+- the kernel build configuration
+- tools or scripts to build a working root fs
+- tools or scripts to build a bootable image
 
-### Devcontainer Setup
+In order to make this project work, as of now, the above components are either replaced by open source alternatives from similar projects or by re-using binaries extracted from the original firmware. This is far from optimal. Many things can hardly be improved without access to the original source code.
 
-This repository supports the [vscode devcontainer](https://code.visualstudio.com/docs/devcontainers/containers) integration.
-To get started, install docker, vscode and the devcontainer extension.
-A [prompt](https://code.visualstudio.com/docs/devcontainers/create-dev-container#_add-configuration-files-to-a-repository) to reopen this repository in a container should appear.
+A lot of foundational work was taken from these projects:
+- [bkleiner/hdzero-goggle-buildroot](https://github.com/bkleiner/hdzero-goggle-buildroot)
+- [bkleiner/hdzero-goggle-linux](https://github.com/bkleiner/hdzero-goggle-linux)
 
-### Native Setup
+Currently Not Working:
+- wifi
 
-CMake is required for generating the build files.
-A bash script is supplied to take care of the bootstrap process:
+## Contents of this repo
+TODO
 
-```
-~/hdzero-goggle$ ./setup.sh
-```
+## Using this firmware
 
-## Building the Firmware
+Build a bootable image and flash it to an sd-card (see below).
+This way, the internal rootfs stays untouched and you can revert back to the original OS at any time by simply unplugging the sd-card.
 
-In either of the above scenarios the firmware can be built via make.
-An appropiate vscode build task ships with this repository as well.
+## Building the firmware
 
-```
-~/hdzero-goggle$ cd build
-~/hdzero-goggle/build$ make clean all -j $(nproc)
-```
-
-The firmware is generated as hdzero-goggle/out/HDZERO_GOGGLE-x.x.x.bin
-Where x.x.x is the OTA_VER.RX_VER.VA_VER
-
-### Building the firmware using nix
-
-The nix build system can be used to build the firmware on any linux system.  
+The nix build system is used to build the firmware.
 Make sure that nix [is installed](https://nixos.org/download/), and the [flakes feature](https://wiki.nixos.org/wiki/Flakes) is enabled.  
-No bootstrapping or installation of any tools is required.
 
-Use this command to build the firmware
+### Build bootable sd-card image
+
+Use this command to build a bootable image to flash to an sd-card
+
+```shellSession
+nix build .#sdcard
+```
+
+The image can be found under `./result/sd-card.img` 
+
+### Build firmware app only
+
+When developing on the firmware app, reflashing the whole sdacrd image each time would be tedious.
+Use this command to build only the firmware app:
 
 ```shellSession
 nix build .#goggle-app
 ```
 
-After this succeeds, the firmware can be found under `./result` in the current directory.
+Tha app can be found under `./result/HDZGOGGLE` and be copied onto to the goggles.
 
-
-## Loading the Firmware
-
-There following methods can be used to load the firmware:
-- flash it via the goggle menu
-- temporarily execute it from an sdcard
-- temporarily execute it via ssh
-
-### Executing firmware via sdcard
-
-On boot, the goggles check the root of the sdcard for a `develop.sh` file. If it exists, it gets executed. This can be used to launch a custom build of the `HDZGOGGLE` executable.
-
-SD Card File Hierarchy:
-
-```
-/develop.sh
-/HDZGOGGLE
-```
-
-`develop.sh` to launch HDZGOGGLE from sdcard or fall back to builtin executable if not found:
-
-```bash
-#!/bin/sh
-
-# Load via SD Card if found
-if [ -e /mnt/extsd/HDZGOGGLE ]; then
-	/mnt/extsd/HDZGOGGLE &
-else
-	/mnt/app/app/HDZGOGGLE &
-fi
-```
-
-### Execute firmware via ssh
+### Execute the firmware app via ssh
 
 Use the script `./utilities/ssh-deploy.sh` inside this repo to temporarily run a custom build of the `HDZGOGGLE` executable on the goggles.
 
@@ -98,42 +72,3 @@ Example:
 
 A powercycle will switch the goggles back to the builtin `HDZGOGGLE`.
 
-## Building the Emulator
-
-Goggle source code can be built natively on the host machine and used for debugging.
-
-### Library required
-
-Requires build-essential tools and SDL2 development libraries (libsdl2-dev for debian) to be already installed.
-
-```
-sudo apt-get install build-essential libsdl2-dev
-```
-
-### Build and Run
-
-```
-~/hdzero-goggle$ mkdir build_emu
-~/hdzero-goggle$ cd build_emu
-~/hdzero-goggle/build_emu$ cmake .. -DEMULATOR_BUILD=ON -DCMAKE_BUILD_TYPE=Debug
-~/hdzero-goggle/build_emu$ make -j $(nproc)
-~/hdzero-goggle/build_emu$ ./HDZGOGGLE
-```
-
-### Emulator Keys
-
-`a` = right button press
-`w` = wheel up
-`s` = wheel down
-`d` = wheel center press
-Use `F11` to toggle full screen where applicable.
-
-## Support and Developer Channels
-
-Join the official Discord server here:
-
-https://discord.gg/kGsnEDMb2V
-
-Or the official Facebook group:
-
-https://www.facebook.com/groups/hdzero
