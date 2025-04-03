@@ -6,18 +6,18 @@ i2cdetect -y 2
 //I2C devices
 //
 //Name   Ports      Device    Address
-//R_I2C	 1          IT66121   0x4C
-//	            MCP3021   0x4D
-//	            BMI270    0x68
-//	            NCT75     0x48
+//R_I2C	 1          IT66121   0x4C      (HDMI OUT)
+//	                MCP3021   0x4D      (10-Bit A/D Converter)
+//	                BMI270    0x68      (Gyro / Accelerometer)
+//	                NCT75     0x48      (Temperature)
 //
-//M_I2C	 2      Main FPGA     0x64        
-//	            AL FPGA   0x65
-//	            GM7150    0x5D
-//	            NCT75     0x48
+//M_I2C	 2          Main FPGA 0x64
+//	                AL FPGA   0x65
+//	                GM7150    0x5D      (Video IN)
+//	                NCT75     0x48      (Temperature)
 //
-//L_I2C	 3      IT66021	    0x49 (HDMI IN)
-//	          NCT75	    0x48
+//L_I2C	 3          IT66021	  0x49      (HDMI IN)
+//	                NCT75	  0x48      (Temperature)
 
 
 
@@ -26,6 +26,6 @@ z:\workspace\hdzero_goggle\workspace\device\config\chips\v536\configs\cdr\linux\
 
 [partition]
     name         = rootfs
-    size         = 23808  <-- reported from make 
+    size         = 23808  <-- reported from make
     downloadfile = "rootfs.fex"
     user_type    = 0x8000
