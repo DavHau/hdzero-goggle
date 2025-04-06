@@ -210,7 +210,7 @@ int hot_alphasort(const struct dirent **a, const struct dirent **b) {
 }
 
 static bool dvr_has_stars(const char *filename) {
-    char star_file[256] = "";
+    char star_file[512 + 16];  // Room for filename + suffix + safety
     int count = snprintf(star_file, sizeof(star_file), "%s" REC_starSUFFIX, filename);
 
     return fs_file_exists(star_file);

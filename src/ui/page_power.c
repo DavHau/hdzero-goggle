@@ -137,15 +137,15 @@ static lv_obj_t *page_power_create(lv_obj_t *parent, panel_arr_t *arr) {
 
     // set menu entry min/max values and labels
     char str[6];
-    snprintf(str, sizeof(buf), "%.2f", g_setting.power.voltage / 1000.0);
+    snprintf(str, sizeof(str), "%.2f", g_setting.power.voltage / 1000.0);
     lv_slider_set_range(slider_group_cell_voltage.slider, WARNING_CELL_VOLTAGE_MIN, WARNING_CELL_VOLTAGE_MAX);
     lv_label_set_text(slider_group_cell_voltage.label, str);
 
-    snprintf(str, sizeof(buf), "%d", g_setting.power.cell_count);
+    snprintf(str, sizeof(str), "%d", g_setting.power.cell_count);
     lv_slider_set_range(slider_group_cell_count.slider, CELL_MIN_COUNT, CELL_MAX_COUNT);
     lv_label_set_text(slider_group_cell_count.label, str);
 
-    snprintf(str, sizeof(buf), "%.2fV", g_setting.power.calibration_offset / 1000.0);
+    snprintf(str, sizeof(str), "%.2fV", g_setting.power.calibration_offset / 1000.0);
     lv_slider_set_range(slider_group_calibration_offset.slider, CALIBRATION_OFFSET_MIN, CALIBRATION_OFFSET_MAX);
     lv_label_set_text(slider_group_calibration_offset.label, str);
 
