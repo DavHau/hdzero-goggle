@@ -50,6 +50,7 @@ stdenv.mkDerivation {
     mkfs.ext4 -d ./mkapp/app app.ext2 "100M"
     mv ./out $out
     mv app.ext2 $out/
+    mv mkapp/app $out/app
     fsck.ext4 -y $out/app.ext2
   '';
 }
