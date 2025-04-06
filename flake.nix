@@ -4,7 +4,8 @@
 # In case of questions, feel free to ask @DavHau
 {
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+    # nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+    nixpkgs.url = "git+https://github.com/DavHau/nixpkgs?shallow=1&ref=dave";
     nixpkgs_22_05.url = "github:nixos/nixpkgs/nixos-22.05";
     nix-filter.url = "github:numtide/nix-filter";
     hdzero-goggle-buildroot.url = "git+https://github.com/bkleiner/hdzero-goggle-buildroot?shallow=1&submodules=1";
@@ -23,6 +24,20 @@
     # Currently can only support x86_64-linux builders, due to the hardcoded toolchain
     system = "x86_64-linux";
     pkgs = nixpkgs.legacyPackages.${system};
+    pkgsArm = import nixpkgs {
+      system = "x86_64-linux";
+      crossSystem = "armv7l-linux";
+      config.pulseaudio = false;
+      overlays = [(curr: prev: {
+        ffmpeg = curr.ffmpeg_6-headless.override {
+          withVaapi = false;
+        };
+        mpg123 = prev.mpg123.override {
+          withPulse = false;
+          withJack = false;
+        };
+      })];
+    };
     # Source code without the nix directory and flake files to improve build caching
     hdzero-goggle-src = nix-filter.lib {
       root = ./.;
@@ -37,6 +52,15 @@
       goggle-app = pkgs.callPackage ./nix/goggle-app.nix {
         inherit hdzero-goggle-src;
         inherit (self.packages.${system}) toolchain;
+      };
+
+      goggle-app-nix = pkgsArm.callPackage ./nix/goggle-app-nix {
+        inherit hdzero-goggle-src nix-filter;
+      };
+
+      goggle-app-nix-static = pkgsArm.pkgsStatic.callPackage ./nix/goggle-app-nix {
+        inherit hdzero-goggle-src nix-filter;
+        inherit (self.packages.${system}) hdzg-os-files toolchain;
       };
 
       # make the goggle app the default package
@@ -87,6 +111,30 @@
           kernel
           rootfs
           ;
+      };
+
+      sdcard-nix = self.packages.${system}.sdcard.override {
+        goggle-app = self.packages.${system}.goggle-app-nix;
+        rootfs = self.packages.${system}.rootfs-nix;
+      };
+
+      extfstools = pkgs.callPackage ./nix/extfstools.nix { };
+
+      hdzg-os-files = pkgs.callPackage ./nix/hdzg-os-files.nix {
+        inherit (self.packages.${system}) extfstools rootfs;
+      };
+
+      rootfs-nix = pkgs.callPackage ./nix/rootfs-nix {
+        inherit (self.packages.${system}) kernel hdzg-os-files;
+        inherit hdzero-goggle-buildroot nix-filter;
+        # goggle-app = self.packages.${system}.goggle-app-nix;
+        goggle-app = self.packages.${system}.goggle-app;
+      };
+
+      emulate = pkgs.callPackage ./nix/emulate {
+        rootfs = self.packages.${system}.rootfs-nix;
+        pkgsLinux = nixpkgs_22_05.legacyPackages.${system}.pkgsCross.armv7l-hf-multiplatform;
+        inherit (self.packages.${system}) kernel;
       };
     };
 

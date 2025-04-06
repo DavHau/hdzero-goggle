@@ -22,11 +22,11 @@
     "hdzero-goggle-linux-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1742964096,
-        "narHash": "sha256-LvHi1BqYC/e8+2s+NYFHR4B2mWL0OoHOz9d5ME/8JRY=",
+        "lastModified": 1743749533,
+        "narHash": "sha256-/gd3PxzpRTfCHT/r3PSIDMDByFAI6JH6++tPs1IutYE=",
         "ref": "hdzero",
-        "rev": "4655a0816b6e7620c3b98b9daf1cc3addde72a87",
-        "revCount": 644468,
+        "rev": "372211c4610666202046a9c1da7a82f5fd2566a8",
+        "revCount": 644469,
         "shallow": false,
         "type": "git",
         "url": "https://github.com/DavHau/hdzero-goggle-linux"
@@ -55,18 +55,19 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1742669843,
-        "narHash": "sha256-G5n+FOXLXcRx+3hCJ6Rt6ZQyF1zqQ0DL0sWAMn2Nk0w=",
-        "owner": "nixos",
-        "repo": "nixpkgs",
-        "rev": "1e5b653dff12029333a6546c11e108ede13052eb",
-        "type": "github"
+        "lastModified": 1743870327,
+        "narHash": "sha256-S4A0kmaVNXadL5AkyEJKyrw+MImC7GZtg91fIA8H/o8=",
+        "ref": "dave",
+        "rev": "2e7e181351a2dc9ba6e51baf4d00cd4cfb548321",
+        "shallow": true,
+        "type": "git",
+        "url": "https://github.com/DavHau/nixpkgs"
       },
       "original": {
-        "owner": "nixos",
-        "ref": "nixos-unstable",
-        "repo": "nixpkgs",
-        "type": "github"
+        "ref": "dave",
+        "shallow": true,
+        "type": "git",
+        "url": "https://github.com/DavHau/nixpkgs"
       }
     },
     "nixpkgs_22_05": {
