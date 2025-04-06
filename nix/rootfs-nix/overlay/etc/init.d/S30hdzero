@@ -1,0 +1,41 @@
+#! /bin/sh
+
+load_modules() {
+    modprobe videobuf2-core
+    modprobe videobuf2-memops
+    modprobe videobuf2-dma-contig
+    modprobe videobuf2-v4l2
+    modprobe vin_io
+    modprobe tp9950
+    modprobe imx415_mipi
+    insmod /mnt/app/ko/hdzero.ko
+    modprobe vin_v4l2
+    modprobe sunxi-wlan
+}
+
+start_hdzero() {
+    printf "Starting hdzero: "
+    load_modules
+    usleep 200000
+    # /mnt/app/script/rc.sh > /dev/null 2>&1
+    /mnt/app/script/rc.sh
+    sleep 1
+    modprobe xradio_wlan
+    usleep 200000
+    echo "OK"
+}
+
+stop_hdzero() {
+    printf "Stopping hdzero: "
+    echo "OK"
+}
+
+case "$1" in
+	start|restart|reload)
+        start_hdzero;;
+	stop)
+        stop_hdzero;;
+	*)
+		echo "Usage: $0 {start|stop|restart|reload}"
+		exit 1
+esac
