@@ -48,6 +48,8 @@ writeShellApplication {
     tmpDir=$(mktemp -d)
     cat ${rootfs}/rootfs.ext2 > "$tmpDir/rootfs.ext4"
 
+    qemu-img resize "$tmpDir/rootfs.ext4" 1G
+
     fsck -y "$tmpDir/rootfs.ext4"
 
       # -sd "$tmpDir/rootfs.ext4" \
