@@ -10,7 +10,7 @@ function setup_uart()
 {
 	echo 0x0300B098 0x00775577 > /sys/class/sunxi_dump/write
 	echo 0x0300B0D8 0x22777777 > /sys/class/sunxi_dump/write
-	echo 0x0300B0fc 0x35517751 > /sys/class/sunxi_dump/write
+	echo 0x0300B0fc 0x35517751 > /sys/class/sunxi_dump/write  # fans to max
 }
 
 function config_uart_vdpo()
@@ -65,7 +65,7 @@ update_boot
 #auto write HDZERO_TX.bin / HDZERO_RX.bin /HDZERO_VA.bin when bootup if they are exist on SD card
 write_flashes
 
-#load driver 
+#load driver
 sleep 1
 insmod /mnt/app/ko/mcp3021.ko
 usleep 2000
