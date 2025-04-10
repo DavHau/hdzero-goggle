@@ -1,5 +1,4 @@
 {
-  hdzero-goggle-linux-src,
   linuxManualConfig,
   stdenv,
   lib,
@@ -7,13 +6,17 @@
   ubootTools,
   breakpointHook,
 
-  configfile ? ./hdzgoggle_defconfig,
+  # flake inputs
+  tinyvision-src,
+
+  # customization
+  configfile ? ../kernel/hdzgoggle_defconfig,
 }:
 let
   linux = linuxManualConfig rec {
     inherit configfile lib stdenv;
-    src = hdzero-goggle-linux-src;
-    version = "4.9.118";
+    src = "${tinyvision-src}/kernel/linux-4.9";
+    version = "4.9.191";
     modDirVersion = version;
     allowImportFromDerivation = true;
   };
@@ -22,15 +25,10 @@ in
     nativeBuildInputs = old.nativeBuildInputs or [] ++ [
       lzop
       ubootTools
+      breakpointHook
     ];
     installTargets = old.installTargets ++ [ "uinstall" ];
     buildFlags = old.buildFlags ++ [
       "uImage"
     ];
-    postPatch = ''
-      substituteInPlace arch/arm/boot/dts/Makefile \
-        --replace \
-          'sun8iw16p1-soc.dtb' \
-          'sun8iw16p1-soc.dtb sun8i-h3-orangepi-pc.dtb'
-    '';
   })
