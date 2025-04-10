@@ -92,7 +92,26 @@
         "hdzero-goggle-linux-src": "hdzero-goggle-linux-src",
         "nix-filter": "nix-filter",
         "nixpkgs": "nixpkgs",
-        "nixpkgs_22_05": "nixpkgs_22_05"
+        "nixpkgs_22_05": "nixpkgs_22_05",
+        "tinyvision-src": "tinyvision-src"
+      }
+    },
+    "tinyvision-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1742486109,
+        "narHash": "sha256-sq4oZM5drU7QEgP+yYQE4wCCWp5Y4iyCEZA2mjysx9E=",
+        "ref": "refs/heads/main",
+        "rev": "ba3bae2cc6af787854635e7bb68399aee99cfd53",
+        "revCount": 192,
+        "shallow": false,
+        "type": "git",
+        "url": "https://github.com/YuzukiHD/TinyVision"
+      },
+      "original": {
+        "shallow": false,
+        "type": "git",
+        "url": "https://github.com/YuzukiHD/TinyVision"
       }
     }
   },

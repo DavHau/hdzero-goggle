@@ -11,7 +11,10 @@
     hdzero-goggle-buildroot.url = "git+https://github.com/bkleiner/hdzero-goggle-buildroot?shallow=1&submodules=1";
     hdzero-goggle-buildroot.flake = false;  # this input doesn't contain a flake.nix
     hdzero-goggle-linux-src.url = "git+https://github.com/DavHau/hdzero-goggle-linux?shallow=true&ref=hdzero";
-    hdzero-goggle-linux-src.flake = false;  # this input doesn't contain a flake.nix
+    hdzero-goggle-linux-src.flake = false;
+    # A similar board with several supported kernels.
+    tinyvision-src.url = "git+https://github.com/YuzukiHD/TinyVision?shallow=true";
+    tinyvision-src.flake = false;
   };
   outputs = {
     self,
@@ -20,6 +23,7 @@
     nix-filter,
     hdzero-goggle-buildroot,
     hdzero-goggle-linux-src,
+    tinyvision-src,
   }: let
     # Currently can only support x86_64-linux builders, due to the hardcoded toolchain
     system = "x86_64-linux";
@@ -60,7 +64,6 @@
 
       goggle-app-nix-static = pkgsArm.pkgsStatic.callPackage ./nix/goggle-app-nix {
         inherit hdzero-goggle-src nix-filter;
-        inherit (self.packages.${system}) hdzg-os-files toolchain;
       };
 
       # make the goggle app the default package
@@ -88,6 +91,13 @@
         inherit (self.packages.${system}) kernel toolchain;
       };
 
+      rootfs-nix = pkgs.callPackage ./nix/rootfs-nix {
+        inherit (self.packages.${system}) hdzg-os-files;
+        inherit hdzero-goggle-buildroot nix-filter;
+        kernel = self.packages.${system}.kernel;
+        goggle-app = self.packages.${system}.goggle-app-nix;
+      };
+
       # tools for creating a bootable image
       hdzero-goggle-tools = pkgs.callPackage ./nix/hdzero-goggle-tools.nix {};
 
@@ -96,6 +106,12 @@
       # builtins.trace pkgsArm.stdenv.hostPlatform.linux-kernel.target
       nixpkgs_22_05.legacyPackages.${system}.pkgsCross.armv7l-hf-multiplatform.callPackage ./nix/kernel {
         inherit hdzero-goggle-linux-src;
+        breakpointHook = pkgs.breakpointHook;
+      };
+
+      # linux kernel version 4.9.191 from a similar board which is properly open sourced
+      kernel-tinyvision = nixpkgs_22_05.legacyPackages.${system}.pkgsCross.armv7l-hf-multiplatform.callPackage ./nix/kernel-tinyvision {
+        inherit tinyvision-src;
         breakpointHook = pkgs.breakpointHook;
       };
 
@@ -120,22 +136,15 @@
 
       extfstools = pkgs.callPackage ./nix/extfstools.nix { };
 
-      hdzg-os-files = pkgs.callPackage ./nix/hdzg-os-files.nix {
-        inherit (self.packages.${system}) extfstools rootfs;
-      };
-
-      rootfs-nix = pkgs.callPackage ./nix/rootfs-nix {
-        inherit (self.packages.${system}) kernel hdzg-os-files;
-        inherit hdzero-goggle-buildroot nix-filter;
-        # goggle-app = self.packages.${system}.goggle-app-nix;
-        goggle-app = self.packages.${system}.goggle-app;
-      };
+      hdzg-os-files = pkgs.callPackage ./nix/hdzg-os-files.nix {};
 
       emulate = pkgs.callPackage ./nix/emulate {
         rootfs = self.packages.${system}.rootfs-nix;
         pkgsLinux = nixpkgs_22_05.legacyPackages.${system}.pkgsCross.armv7l-hf-multiplatform;
         inherit (self.packages.${system}) kernel;
       };
+
+      libpeer = pkgs.callPackage ./nix/libpeer.nix {};
     };
 
     # a dev environment which can be entered via `nix develop .`
