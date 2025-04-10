@@ -170,13 +170,16 @@ let
       '';
     };
 in
-  runCommand "hdzero-rootfs"
-    {
-      nativeBuildInputs = [
-        e2tools
-      ];
-    }
-    ''
+  stdenv.mkDerivation {
+    name = "hdzero-rootfs";
+    nativeBuildInputs = [
+      e2tools
+    ];
+    dontUnpack = true;
+    dontConfigure = true;
+    buildPhase = ''
+      runHook preBuild
+
       rootfs="$PWD/rootfs.ext2"
       cp ${baseFs}/rootfs.ext2 "$rootfs"
       chmod +w "$rootfs"
@@ -209,6 +212,14 @@ in
       # add vclk_phase.cfg
       e2cp -vp "${./vclk_phase.cfg}" "$rootfs:/etc/vclk_phase.cfg"
 
+      runHook postBuild
+    '';
+    installPhase = ''
+      runHook preInstall
+
       mkdir $out
       mv rootfs.ext2 $out/
-    ''
+
+      runHook postInstall
+    '';
+  }

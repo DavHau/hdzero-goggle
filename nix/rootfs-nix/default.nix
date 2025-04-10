@@ -6,6 +6,7 @@
   e2fsprogs,
   autoPatchelfHook,
   lib,
+  fetchFromGitHub,
 
   # inputs
   nix-filter,
@@ -25,6 +26,12 @@ let
     root = ../../mkapp/app/ko;
   };
   busybox = pkgs.pkgsStatic.busybox;
+  arbianFirmware = fetchFromGitHub {
+    owner = "armbian";
+    repo = "firmware";
+    rev = "4050e02da2dce2b74c97101f7964ecfb962f5aec";
+    hash = "sha256-wc4xyNtUlONntofWJm8/w0KErJzXKHijOyh9hAYTCoU=";
+  };
   includedPrograms = map getBin [
     busybox
     pkgs.haveged
@@ -83,11 +90,6 @@ runCommand "rootfs-nix" {
   rsync -a $paths fs/nix/store/
 
   mkdir fs/lib
-  # copy the libs from patchedLibs
-  for lib in $(find ${patchedLibs}/lib -type f); do
-    echo "copying $lib"
-    cp -v $lib fs/lib/$(basename $lib)
-  done
 
   binfiles=$(find ${hdzg-os-files}/{bin,sbin,usr/bin,usr/sbin} -type f -or -type l)
   for binfile in $binfiles; do
@@ -125,9 +127,11 @@ runCommand "rootfs-nix" {
   mkdir -p fs/tmp
   ln -s /tmp fs/var
 
-  # install custom files from bkleiner/hdzero-goggle-buildroot
+  # install custom scripts from bkleiner/hdzero-goggle-buildroot
   chmod +w -R fs
+  # copy some shell scripts to /bin
   cp ${hdzero-goggle-buildroot}/board/hdzgoggle_common/rootfs_overlay/usr/sbin/* fs/bin/
+
   rsync -a ${hdzero-goggle-buildroot}/board/hdzgoggle_common/rootfs_overlay/ fs/ \
     --exclude usr/sbin \
     --exclude 'usr/sbin/*'
@@ -164,6 +168,10 @@ runCommand "rootfs-nix" {
       echo "skipping $ko, already exists at $location"
     fi
   done
+
+  mkdir -p fs/etc/firmware
+  # cp ${arbianFirmware}/xr819/{boot_xr819.bin,sdd_xr819.bin} fs/etc/firmware/
+  cp ${arbianFirmware}/xr819/*.bin fs/etc/firmware/
 
   for path in $(find ${hdzg-os-files} ! -type d); do
     # continue if path in ignore

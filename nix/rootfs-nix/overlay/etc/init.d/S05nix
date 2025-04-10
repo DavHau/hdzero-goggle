@@ -1,0 +1,11 @@
+#!/bin/sh
+
+# customizations needed for the nix based image
+
+# This prevents spamming of warning of this kind:
+#   tina kern.warn kernel: [ 1213.053354] c=25,a=0x   8eb48,bs=    8,t=     2346us,sp=   1705KB/s
+echo 0 > /sys/devices/platform/soc/sdc0/sunxi_host_filter_w_speed
+
+
+# This is needed for the HDZGOGGLE app real time clock access
+ln -s /dev/rtc0 /dev/rtc

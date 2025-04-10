@@ -1,0 +1,3 @@
+#!/bin/sh
+
+echo 0x0300B0fc 0x35517751 > /sys/class/sunxi_dump/write  # fans to max
