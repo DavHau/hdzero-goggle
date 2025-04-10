@@ -41,6 +41,8 @@ stdenv.mkDerivation {
     util-linux
   ];
   buildPhase = ''
+    runHook preBuild
+
     BOARD_DIR="${hdzero-goggle-buildroot}/board/hdzgoggle_sdcard"
     COMMON_BOARD_DIR="${hdzero-goggle-buildroot}/board/hdzgoggle_common"
     source $COMMON_BOARD_DIR/functions.sh
@@ -60,7 +62,7 @@ stdenv.mkDerivation {
     # override the app with our own build
     e2cp -vp ${goggle-app}/HDZGOGGLE app.ext2:/app/HDZGOGGLE
 
-    u_boot_env_gen $BOARD_DIR/env.cfg env.fex
+    u_boot_env_gen ${./env.cfg} env.fex
 
     KERNEL_SIZE=$(stat -c%s uImage)
     ROOTFS_SIZE=$(stat -c%s rootfs.ext2)
@@ -103,6 +105,8 @@ stdenv.mkDerivation {
 
     BUILD_DIR="$PWD" \
       bash ${./genimage.sh} -c "$BOARD_DIR/genimage.cfg"
+
+    runHook postBuild
   '';
   installPhase = ''
     mkdir -p $out
