@@ -51,7 +51,7 @@ let
     # added manually
     "lib/softwinner/include/middleware/media/LIBRARY/libisp"
   ];
-  patchedLibs = stdenv.mkDerivation {
+  softwinnerLibs = stdenv.mkDerivation {
     name = "hdzero-app-libs-patched";
     src = nix-filter.lib {
       root = hdzero-goggle-src;
@@ -135,13 +135,7 @@ stdenv.mkDerivation {
       "lib/minIni"
     ];
   };
-  passthru = {inherit patchedLibs;};
-  postPatch = ''
-    substituteInPlace ./mkapp/mkapp_ota.sh \
-      --replace-fail "APP_VERSION=\$(get_app_version)" "APP_VERSION=${version}"
-    patchShebangs ./mkapp/mkapp_ota.sh
-    cp ${./CMakeLists-nix.txt} ./CMakeLists.txt
-  '';
+  passthru = {patchedLibs = softwinnerLibs;};
   nativeBuildInputs = [
     cmake
     mtdutils
@@ -154,7 +148,7 @@ stdenv.mkDerivation {
   ];
   buildInputs = [
     stdenv.cc.cc.lib
-    patchedLibs
+    softwinnerLibs
     alsa-lib
     libxcrypt
     live555
@@ -162,6 +156,36 @@ stdenv.mkDerivation {
     zlib
     ncurses5
   ];
+  hardeningDisable = [
+    "format"
+    "stackprotector"
+    "fortify"
+    "fortify3"
+    "fortify3"
+    # "pic"
+    "strictoverflow"
+    "bindnow"
+    "zerocallusedregs"
+    "stackclashprotection"
+  ];
+  cmakeFlags = [
+    "-DCMAKE_BUILD_TYPE=Release"
+  ];
+  # libc.so raises issues during runtime, therefore link against libc.so.6
+  patchelfFlags = [
+    "--replace-needed libc.so libc.so.6"
+  ];
+  postPatch = ''
+    substituteInPlace ./mkapp/mkapp_ota.sh \
+      --replace-fail "APP_VERSION=\$(get_app_version)" "APP_VERSION=${version}"
+    patchShebangs ./mkapp/mkapp_ota.sh
+    cp ${./CMakeLists-nix.txt} ./CMakeLists.txt
+
+    # Disable the services installation hack that upstream uses
+    # (it breaks the sd card on first boot)
+    echo -e "#!/bin/sh\ntrue" > mkapp/app/services/install.sh
+    echo -e "#!/bin/sh\ntrue" > mkapp/app/services/startup.sh
+  '';
   preBuild =
     let
       ldflags = [
@@ -188,6 +212,7 @@ stdenv.mkDerivation {
       for include in ${live555}/include/*; do
         export CPATH="$CPATH:$include"
       done
+      # export NIX_CFLAGS_COMPILE="$NIX_CFLAGS_COMPILE -Wno-unused-result -fsanitize=address"
       export NIX_CFLAGS_COMPILE="$NIX_CFLAGS_COMPILE -Wno-unused-result"
       export NIX_LDFLAGS="$NIX_LDFLAGS ${toString ldflags}"
       export PATH="$PATH:${pkgsBuildBuild.binutils}/bin"
@@ -200,20 +225,14 @@ stdenv.mkDerivation {
   installPhase = ''
     mkdir -p $out/bin
     mv HDZGOGGLE record rtspLive $out/bin
-
-    # Disable the services installation hack that upstream uses
-    # (it breaks the sd card on first boot)
-    echo -e "#!/bin/sh\ntrue" > ../mkapp/app/services/install.sh
-    echo -e "#!/bin/sh\ntrue" > ../mkapp/app/services/startup.sh
-
-    # build spp.ext2
-    mkfs.ext4 -d ../mkapp/app app.ext2 "100M"
-    mv app.ext2 $out/
     mv ../mkapp/app $out/
-    fsck.ext4 -y $out/app.ext2
   '';
+  # build the app.ext2 after binaries have been fixed
   postFixup = ''
+    # build app.ext2
+    mkfs.ext4 -d $out/app app.ext2 "100M"
+    mv app.ext2 $out/
+    fsck.ext4 -y $out/app.ext2
     cp $out/bin/HDZGOGGLE $out/app/app/HDZGOGGLE
-    readelf -a $out/app/app/HDZGOGGLE
   '';
 }
