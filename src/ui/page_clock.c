@@ -114,11 +114,24 @@ static void page_clock_build_options(dropdown_list_t *options, int total_entries
     snprintf(options->entry, sizeof(options->entry), "%d", selected);
 }
 
+
+static void page_clock_sanitize_date(struct rtc_date *date) {
+    if (date->month < 1 || date->month > 12) date->month = 1;
+    if (date->day < 1 || date->day > 31) date->day = 1;
+    if (date->hour > 23) date->hour = 0;
+    if (date->min > 59) date->min = 0;
+    if (date->sec > 59) date->sec = 0;
+}
+
+
 /**
  * Populates all dropdown fields. Leap Year is automatically derived
  * and when Month is manipulated, the number of days are recalculated.
  */
 static void page_clock_build_options_from_date(struct rtc_date *date) {
+
+    page_clock_sanitize_date(date);
+
     int ndays = rtc_days_per_month(date->year, date->month - 1);
     date->day = ndays < date->day ? ndays : date->day;
 
