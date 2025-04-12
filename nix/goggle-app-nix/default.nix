@@ -185,6 +185,18 @@ stdenv.mkDerivation {
     # (it breaks the sd card on first boot)
     echo -e "#!/bin/sh\ntrue" > mkapp/app/services/install.sh
     echo -e "#!/bin/sh\ntrue" > mkapp/app/services/startup.sh
+
+    substituteInPlace src/ui/page_common.h \
+      --replace-fail \
+        '#define WIFI_OFF      "/mnt/app/script/wlan_stop.sh"' \
+        '#define WIFI_OFF      "true"' \
+      --replace-fail \
+        '#define WIFI_AP_ON    "/tmp/wlan_start_ap.sh"' \
+        '#define WIFI_AP_ON    "true"' \
+      --replace-fail \
+        '#define WIFI_STA_ON   "/tmp/wlan_start_sta.sh"' \
+        '#define WIFI_STA_ON   "true"'
+
   '';
   preBuild =
     let
