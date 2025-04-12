@@ -19,18 +19,36 @@
 }:
 let
   machine = pkgs.nixos {
+    imports = [
+      ./modules/wifi.nix
+    ];
+
     services.udev.enable = false;
+
+    # minify
+    nixpkgs.flake.setFlakeRegistry = false;
+    nixpkgs.flake.setNixPath = false;
+    nix.registry = lib.mkForce { };
+    documentation.doc.enable = false;
+    documentation.man.enable = false;
+
+    # needed for nixos-rebuild-switch to work
+    system.build.installBootLoader = pkgs.writeShellScript "hdzero-switch-boot" ''
+      ln -sf $1/init /init
+    '';
 
     boot.kernelPackages = pkgs.linuxPackagesFor kernel;
     boot.initrd.enable = false;
     boot.kernel.enable = false;
     boot.loader.grub.enable = false;
+    services.avahi.enable = true;
+    services.avahi.nssmdns4 = true;
+    networking.hostName = "hdzero";
     fileSystems."/" = {
       device = "/dev/disk/by-label/nixos";
       autoResize = true;
       fsType = "ext4";
     };
-    # virtualisation.docker.enable = true;
     users.users.root.initialPassword = "root";
     users.mutableUsers = true;
     services.openssh.enable = true;
@@ -42,7 +60,7 @@ let
       goggle-app
       hdzero-scripts
       pkgs.bat
-      pkgs.haveged
+      # pkgs.haveged
       pkgs.hostapd
       pkgs.htop
       pkgs.i2c-tools
@@ -52,6 +70,7 @@ let
       pkgs.strace
       pkgs.vim
       pkgs.wpa_supplicant
+      pkgs.busybox
     ];
     nix.settings.experimental-features = [
       "nix-command"
@@ -121,32 +140,6 @@ let
       #   tina kern.warn kernel: [ 1213.053354] c=25,a=0x   8eb48,bs=    8,t=     2346us,sp=   1705KB/s
       echo 0 > /sys/devices/platform/soc/sdc0/sunxi_host_filter_w_speed
     '';
-    # systemd.services."serial-getty@" = {
-    #   path = [
-    #     pkgs.bash
-    #     pkgs.util-linux
-    #     pkgs.coreutils
-    #     pkgs.findutils
-    #     pkgs.busybox
-    #     pkgs.htop
-    #     pkgs.openssh
-    #   ];
-    #   serviceConfig.ExecStart = lib.mkForce [
-    #     "" # override upstream default with an empty ExecStart
-    #     ("/bin/sh")
-    #   ];
-    #   restartIfChanged = false;
-    # };
-    # boot.isContainer = true;
-    # system.activationScripts.etc-post.deps = ["etc"];
-    # system.activationScripts.users.deps = ["etc-post"];
-    # system.build.etcActivationCommands = lib.mkForce "PATH=${lib.makeBinPath [
-    #   pkgs.coreutils
-    #   pkgs.bash
-    #   pkgs.findutils
-    #   pkgs.busybox
-    #   (pkgs.perl.withPackages (p: [ p.FileSlurp ]))
-    # ]} /bin/sh";
   };
 
   koDir = nix-filter.lib {
@@ -179,29 +172,15 @@ in
       breakpointHook
     ];
     buildPhase = ''
-      rsync -a ${toplevel}/ fs
-      chmod +w -R fs
+      mkdir fs
+      ln -s ${toplevel}/init fs/init
 
       mkdir -p fs/nix/store
       paths="$(python3 -c 'import json; [print(x["path"]) for x in json.load(open(".attrs.json"))["closure"]]' | sort | uniq)"
       rsync -a $paths fs/nix/store/
 
-      # mkdir fs/{dev,proc,run,sys,tmp,var}
-      chmod +w fs
-      rm fs/etc
-
       mkdir fs/mnt
       cp -r ${goggle-app}/app fs/mnt/app
-
-      ln -s ${pkgs.bash}/bin/bash fs/bin/sh
-
-      # install custom scripts from bkleiner/hdzero-goggle-buildroot
-
-      # copy some shell scripts to /bin
-      chmod +w fs/bin
-      rm -r fs/bin
-      mkdir fs/bin
-      cp ${hdzero-goggle-buildroot}/board/hdzgoggle_common/rootfs_overlay/usr/sbin/* fs/bin/
 
       # install /etc/vclk_phase.cfg
       mkdir fs/etc
@@ -232,7 +211,7 @@ in
       cp ${arbianFirmware}/xr819/*.bin fs/etc/firmware/
 
       mkdir $out
-      mkfs.ext4 -d fs $out/rootfs.ext2 1200M \
+      mkfs.ext4 -d fs $out/rootfs.ext2 1G \
         -E root_owner=0:0
 
       chmod +w -R fs
