@@ -138,6 +138,10 @@
         init = "/init";
       };
 
+      xradio-driver = pkgsArm.callPackage ./nix/xradio-driver {
+        inherit (self.packages.${system}) kernel;
+      };
+
       # filesystem extracted from the original HDZG_OS.bin
       hdzg-os-files = pkgs.callPackage ./nix/hdzg-os-files.nix {};
 
