@@ -28,6 +28,7 @@
     # Currently can only support x86_64-linux builders, due to the hardcoded toolchain
     system = "x86_64-linux";
     pkgs = nixpkgs.legacyPackages.${system};
+    lib = nixpkgs.lib;
     pkgsArm = import nixpkgs {
       system = "x86_64-linux";
       crossSystem = "armv7l-linux";
@@ -48,7 +49,7 @@
     # Source code without the nix directory and flake files to improve build caching
     hdzero-goggle-src = nix-filter.lib {
       root = ./.;
-      exclude = [ "nix" "flake.nix" "flake.lock" ];
+      include = [ "lib" "src" "CMakeLists.txt" "VERSION" "mkapp" ];
     };
   in
   {
@@ -105,6 +106,7 @@
         inherit (self.packages.${system}) hdzero-scripts;
         kernel = self.packages.${system}.kernel;
         goggle-app = self.packages.${system}.goggle-app-nix;
+        machine = self.nixosConfigurations.hdzero;
       };
 
       # sdcard containing:
@@ -172,6 +174,16 @@
     # a dev environment which can be entered via `nix develop .`
     devShells.${system}.default = pkgs.callPackage ./nix/devShell.nix {
       inherit (self.packages.${system}) toolchain;
+    };
+
+    nixosConfigurations.hdzero = lib.nixosSystem {
+      specialArgs = {
+        packages = self.packages.${system};
+      };
+      modules = [{
+        nixpkgs.pkgs = pkgsArm;
+        imports = [./machines/hdzero/configuration.nix];
+      }];
     };
   };
 }

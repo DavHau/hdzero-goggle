@@ -14,17 +14,20 @@ let
   '';
 in
 {
-  systemd.services.hdzero-wifi = {
+  systemd.services.wifi = {
     description = "HDZero WiFi";
     wantedBy = [ "multi-user.target" ];
+    after = [ "network.target" ];
     path = [
       pkgs.bash
       pkgs.busybox
       pkgs.wpa_supplicant
     ];
-    restart = "always";
+    serviceConfig.Restart = "always";
+    serviceConfig.RestartSec = 3;
     script = ''
       set -x
+      modprobe sunxi-wlan
       insmod ${koDir}/xradio_mac.ko || :
       insmod ${koDir}/xradio_core.ko || :
       insmod ${koDir}/xradio_wlan.ko || :
