@@ -22,9 +22,10 @@ let
 
       nixos_defconfig=${../kernel/nixos_defconfig}
       # get all keys from nixos_defconfig
-      nixos_keys=$(grep -oP 'CONFIG_\K[^=]+' $nixos_defconfig)
+      nixos_keys=$(cat $nixos_defconfig | grep -v '#' | grep -oP 'CONFIG_\K[^=]+')
       # remove all lines from $out that are in $nixos_keys
       for key in $nixos_keys; do
+        echo "removing $key from $out"
         sed -i "/$key/d" $out
       done
       cat ${./nixos_defconfig} >> $out
