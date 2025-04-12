@@ -1,0 +1,71 @@
+# needed for nixos
+CONFIG_CGROUPS=y
+CONFIG_FHANDLE=y
+CONFIG_CRYPTO_USER_API_HASH=y
+CONFIG_DMIID=y
+CONFIG_AUTOFS_FS=y
+CONFIG_SECCOMP=y
+CONFIG_BLK_DEV_INITRD=y
+CONFIG_DECOMPRESS_LZMA=y
+CONFIG_KERNEL_LZMA=y
+
+# namespaces
+CONFIG_NAMESPACES=y           # Master switch for namespaces
+CONFIG_UTS_NS=y               # UTS (hostname/domainname) namespace
+CONFIG_IPC_NS=y               # IPC namespace
+CONFIG_USER_NS=y              # User namespace (required for unprivileged containers)
+CONFIG_PID_NS=y               # PID namespace
+CONFIG_NET_NS=y               # Network namespace
+CONFIG_CGROUP_NS=y            # Cgroup namespace
+
+# internet
+CONFIG_IPV6=y
+
+# ACL (needed by udev)
+CONFIG_EXT4_FS_POSIX_ACL=y
+CONFIG_EXT3_FS_POSIX_ACL=y
+CONFIG_EXT2_FS_POSIX_ACL=y
+CONFIG_TMPFS_POSIX_ACL=y
+
+# systemd
+CONFIG_AUTOFS4_FS=y
+
+# firewall
+CONFIG_NF_TABLES=y
+CONFIG_NF_TABLES_INET=y         # For mixed IPv4/IPv6 tables (e.g., iptables -t filter)
+CONFIG_NFT_CHAIN_ROUTE_IPV4=y
+CONFIG_NFT_CHAIN_ROUTE_IPV6=y
+CONFIG_NFT_REJECT=y
+CONFIG_NFT_REJECT_INET=y
+CONFIG_NFT_MASQ=y
+CONFIG_NFT_NAT=y
+CONFIG_NFT_LOG=y
+CONFIG_NFT_COUNTER=y
+CONFIG_NETFILTER_XTABLES_COMPAT=y   # Needed for legacy iptables compatibility
+CONFIG_NETFILTER=y
+
+# enable /proc/config.gz
+CONFIG_IKCONFIG=y
+CONFIG_IKCONFIG_PROC=y
+
+# for qemu
+CONFIG_VIRTIO=y
+CONFIG_VIRTIO_PCI=y
+CONFIG_VIRTIO_MMIO=y
+CONFIG_VIRTIO_BLK=y
+CONFIG_VIRTIO_NET=y
+CONFIG_PCI=y
+CONFIG_PCI_HOST_GENERIC=y
+CONFIG_PCI_SYSCALL=y
+CONFIG_ARM_PSCI_FW=y
+CONFIG_SUN4I_EMAC=y
+CONFIG_PHYLIB=y
+CONFIG_FIXED_PHY=y
+CONFIG_MDIO_BUS=y
+CONFIG_MDIO_SUN4I=y
+CONFIG_REALTEK_PHY=y
+CONFIG_SMSC_PHY=y
+CONFIG_GENERIC_PHY=y
+
+# increase dmesg buffer size
+CONFIG_LOG_BUF_SHIFT=18

@@ -142,7 +142,6 @@ runCommand "rootfs-nix" {
   chmod +w -R fs
 
   # install /etc/vclk_phase.cfg
-
   cp ${../rootfs/vclk_phase.cfg} fs/etc/vclk_phase.cfg
 
   # create /linuxrc
@@ -170,7 +169,6 @@ runCommand "rootfs-nix" {
   done
 
   mkdir -p fs/etc/firmware
-  # cp ${arbianFirmware}/xr819/{boot_xr819.bin,sdd_xr819.bin} fs/etc/firmware/
   cp ${arbianFirmware}/xr819/*.bin fs/etc/firmware/
 
   for path in $(find ${hdzg-os-files} ! -type d); do

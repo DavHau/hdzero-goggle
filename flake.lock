@@ -22,11 +22,11 @@
     "hdzero-goggle-linux-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1743749533,
-        "narHash": "sha256-/gd3PxzpRTfCHT/r3PSIDMDByFAI6JH6++tPs1IutYE=",
+        "lastModified": 1744375860,
+        "narHash": "sha256-sYYZTl6rjDeGtI2HiT2jSAULNcwECrSa4lz49RsreyU=",
         "ref": "hdzero",
-        "rev": "372211c4610666202046a9c1da7a82f5fd2566a8",
-        "revCount": 644469,
+        "rev": "2058eb761002655558d4e9f6a9e4d2aabcabb8c0",
+        "revCount": 644471,
         "shallow": false,
         "type": "git",
         "url": "https://github.com/DavHau/hdzero-goggle-linux"

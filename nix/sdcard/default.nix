@@ -6,6 +6,7 @@
   util-linux,
   runCommand,
   dtc,
+  writeText,
 
   # from this project
   goggle-app,
@@ -13,6 +14,9 @@
   hdzero-goggle-buildroot,
   kernel,
   rootfs,
+
+  # customization
+  init ? "/init",
 }:
 let
   # dtbDir = "${os-images}/images";
@@ -27,6 +31,9 @@ let
   appExt2File = "${goggle-app}/app.ext2";
   rootfsExt2File = "${rootfs}/rootfs.ext2";
   uImage = "${kernel}/uImage";
+  env_cfg = writeText "env.cfg" (import ./env.cfg.nix {
+    inherit init;
+  });
 in
 stdenv.mkDerivation {
   name = "hdzero-goggle-sdcard";
@@ -62,7 +69,7 @@ stdenv.mkDerivation {
     # override the app with our own build
     e2cp -vp ${goggle-app}/HDZGOGGLE app.ext2:/app/HDZGOGGLE
 
-    u_boot_env_gen ${./env.cfg} env.fex
+    u_boot_env_gen ${env_cfg} env.fex
 
     KERNEL_SIZE=$(stat -c%s uImage)
     ROOTFS_SIZE=$(stat -c%s rootfs.ext2)

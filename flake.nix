@@ -40,6 +40,9 @@
           withPulse = false;
           withJack = false;
         };
+        docker-compose = prev.docker-compose.overrideAttrs (old: {
+          vendorHash = "sha256-6KLdDBuPiB/qh+3IfABu8Gvopu5ucTrNg9jh7G+cMss=";
+        });
       })];
     };
     # Source code without the nix directory and flake files to improve build caching
@@ -98,6 +101,13 @@
         goggle-app = self.packages.${system}.goggle-app-nix;
       };
 
+      rootfs-nixos = pkgsArm.callPackage ./nix/rootfs-nixos {
+        inherit hdzero-goggle-buildroot nix-filter;
+        inherit (self.packages.${system}) hdzero-scripts;
+        kernel = self.packages.${system}.kernel;
+        goggle-app = self.packages.${system}.goggle-app-nix;
+      };
+
       # tools for creating a bootable image
       hdzero-goggle-tools = pkgs.callPackage ./nix/hdzero-goggle-tools.nix {};
 
@@ -127,6 +137,7 @@
           kernel
           rootfs
           ;
+        init = "/linuxrc";
       };
 
       sdcard-nix = self.packages.${system}.sdcard.override {
@@ -134,17 +145,26 @@
         rootfs = self.packages.${system}.rootfs-nix;
       };
 
+      sdcard-nixos = self.packages.${system}.sdcard.override {
+        goggle-app = self.packages.${system}.goggle-app-nix;
+        rootfs = self.packages.${system}.rootfs-nixos;
+        init = "/init";
+      };
+
       extfstools = pkgs.callPackage ./nix/extfstools.nix { };
 
       hdzg-os-files = pkgs.callPackage ./nix/hdzg-os-files.nix {};
 
       emulate = pkgs.callPackage ./nix/emulate {
-        rootfs = self.packages.${system}.rootfs-nix;
+        rootfs = self.packages.${system}.rootfs-nixos;
         pkgsLinux = nixpkgs_22_05.legacyPackages.${system}.pkgsCross.armv7l-hf-multiplatform;
         inherit (self.packages.${system}) kernel;
+        # inherit hdzero-goggle-linux-src;
       };
 
       libpeer = pkgs.callPackage ./nix/libpeer.nix {};
+
+      hdzero-scripts = pkgs.callPackage ./nix/hdzero-scripts {};
     };
 
     # a dev environment which can be entered via `nix develop .`

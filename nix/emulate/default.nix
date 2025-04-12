@@ -4,6 +4,7 @@
   lib,
   qemu,
   writeShellApplication,
+  runCommand,
 
   # from this project
   kernel,
@@ -18,9 +19,21 @@ let
     hash = "sha256-uBuCZJBGfv+uwDl7fenIrFMwRzQzqFIjIExH3cvP90g=";
   };
 
+  configfile = runCommand "configfile" {} ''
+    cat ${linuxSrc}/arch/arm/configs/sunxi_defconfig > $out
+
+    nixos_defconfig=${../kernel/nixos_defconfig}
+    # get all keys from nixos_defconfig
+    nixos_keys=$(grep -oP 'CONFIG_\K[^=]+' $nixos_defconfig)
+    # remove all lines from $out that are in $nixos_keys
+    for key in $nixos_keys; do
+      sed -i "/$key/d" $out
+    done
+    cat ${../kernel/nixos_defconfig} >> $out
+  '';
+
   qemuKernel = (pkgsLinux.linuxManualConfig rec {
-    inherit lib;
-    configfile = "${linuxSrc}/arch/arm/configs/sunxi_defconfig";
+    inherit lib configfile;
     stdenv = pkgsLinux.stdenv;
     src = linuxSrc;
     version = linuxVer;
@@ -38,7 +51,7 @@ let
 in
 writeShellApplication {
   name = "emulate";
-  passthru = {inherit qemuKernel;};
+  passthru = {inherit qemuKernel configfile;};
   runtimeInputs = [
     qemu
     e2fsprogs
@@ -48,19 +61,16 @@ writeShellApplication {
     tmpDir=$(mktemp -d)
     cat ${rootfs}/rootfs.ext2 > "$tmpDir/rootfs.ext4"
 
-    qemu-img resize "$tmpDir/rootfs.ext4" 1G
-
-    fsck -y "$tmpDir/rootfs.ext4"
+    qemu-img resize "$tmpDir/rootfs.ext4" 2G
 
       # -sd "$tmpDir/rootfs.ext4" \
     qemu-system-arm -M orangepi-pc \
       -nographic \
       -nic user \
       -kernel ${qemuKernel}/zImage \
-      -append 'console=ttyS0,115200 root=/dev/mmcblk0 rootwait earlyprintk loglevel=8 earlycon=uart8250,mmio32,0x1c28000,115200n8' \
+      -append 'console=ttyS0,115200 root=/dev/mmcblk0 init=/init rootwait earlyprintk loglevel=8 earlycon=uart8250,mmio32,0x1c28000,115200n8' \
       -dtb ${kernel}/dtbs/sun8i-h3-orangepi-pc.dtb \
       -drive if=sd,driver=file,filename="$tmpDir/rootfs.ext4"
-      # -sd "/tmpflakep/unpack/OrangePi_pc_debian_stretch_server_linux3.4.113_v1.0.img"
 
   '';
 }
