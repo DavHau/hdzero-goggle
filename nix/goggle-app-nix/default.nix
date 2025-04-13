@@ -19,6 +19,7 @@
   ffmpeg,
   zlib,
   ncurses5,
+  fetchFromGitHub,
 
   # flake inputs
   nix-filter,
@@ -32,6 +33,12 @@ let
     removeSuffix
     ;
   version = removeSuffix "\n" (readFile (hdzero-goggle-src + "/VERSION"));
+  lvgl-src = fetchFromGitHub {
+    owner = "lvgl";
+    repo = "lvgl";
+    rev = "v8.4.0";
+    hash = "sha256-9IrcWUUsem3so8trM+0odNWpuqVEdtkqXOfJsV9kFFM=";
+  };
   softwinnerIncludes = [
     # copied from CMakeLists.txt
     "lib/softwinner/include/system/public/include"
@@ -197,6 +204,9 @@ stdenv.mkDerivation {
         '#define WIFI_STA_ON   "/tmp/wlan_start_sta.sh"' \
         '#define WIFI_STA_ON   "true"'
 
+    rm -r lib/lvgl/lvgl
+    cp -r ${lvgl-src} lib/lvgl/lvgl
+    chmod +w -R lib/lvgl
   '';
   preBuild =
     let
