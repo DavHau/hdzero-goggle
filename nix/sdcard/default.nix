@@ -111,7 +111,7 @@ stdenv.mkDerivation {
     dragonsecboot -pack "$COMMON_BOARD_DIR/boot_package.cfg"
 
     BUILD_DIR="$PWD" \
-      bash ${./genimage.sh} -c "$BOARD_DIR/genimage.cfg"
+      bash ${./genimage.sh} -c "${./genimage.cfg}"
 
     runHook postBuild
   '';
