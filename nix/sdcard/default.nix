@@ -7,6 +7,7 @@
   runCommand,
   dtc,
   writeText,
+  mtools,
 
   # from this project
   goggle-app,
@@ -46,6 +47,7 @@ stdenv.mkDerivation {
     genimage
     hdzero-goggle-tools
     util-linux
+    mtools
   ];
   buildPhase = ''
     runHook preBuild
@@ -109,6 +111,10 @@ stdenv.mkDerivation {
 
     cp -vr $COMMON_BOARD_DIR/image/{optee,scp,soc-cfg}.fex .
     dragonsecboot -pack "$COMMON_BOARD_DIR/boot_package.cfg"
+
+    fallocate -l 16M config.fat32
+    mformat -i config.fat32 ::
+    mcopy -i config.fat32 ${./setting.ini} ::/setting.ini
 
     BUILD_DIR="$PWD" \
       bash ${./genimage.sh} -c "${./genimage.cfg}"

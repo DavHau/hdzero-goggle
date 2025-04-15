@@ -20,6 +20,11 @@ A lot of foundational work was taken from these projects:
 Currently Not Working:
 - wifi
 
+## Features of this firmware
+This firmware includes all features of the original firmware, plus:
+- declarative configuration: settings can be modified on PC via sdcard
+- mDNS: connect to goggle via `hdzero.local` instead of `192.168.X.X`
+
 ## Contents of this repo
 TODO
 

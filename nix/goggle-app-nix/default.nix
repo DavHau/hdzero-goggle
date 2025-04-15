@@ -202,7 +202,10 @@ stdenv.mkDerivation {
         '#define WIFI_AP_ON    "true"' \
       --replace-fail \
         '#define WIFI_STA_ON   "/tmp/wlan_start_sta.sh"' \
-        '#define WIFI_STA_ON   "true"'
+        '#define WIFI_STA_ON   "true"' \
+      --replace-fail \
+        '#define SETTING_INI "/mnt/app/setting.ini"' \
+        '#define SETTING_INI "/mnt/config/setting.ini"'
 
     rm -r lib/lvgl/lvgl
     cp -r ${lvgl-src} lib/lvgl/lvgl

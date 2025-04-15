@@ -59,6 +59,9 @@
     autoResize = true;
     fsType = "ext4";
   };
+  fileSystems."/mnt/config" = {
+    device = "/dev/mmcblk0p3";
+  };
   services.openssh.enable = true;
   services.openssh.settings.PermitRootLogin = "yes";
   networking.firewall.enable = false;
