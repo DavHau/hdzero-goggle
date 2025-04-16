@@ -306,19 +306,19 @@ static void page_wifi_update_settings() {
     settings_put_bool("wifi", "ssh", g_setting.wifi.ssh);
 
     // Prepare WiFi interfaces
-    system_script(WIFI_OFF);
-    page_wifi_update_services();
+    // system_script(WIFI_OFF);
+    // page_wifi_update_services();
 
     // Activate WiFi interface
     if (g_setting.wifi.enable) {
         if (g_app_state == APP_STATE_MAINMENU) {
             dvr_update_vi_conf(VR_1080P30);
         }
-        if (WIFI_MODE_AP == g_setting.wifi.mode) {
-            system_script(WIFI_AP_ON);
-        } else {
-            system_script(WIFI_STA_ON);
-        }
+        // if (WIFI_MODE_AP == g_setting.wifi.mode) {
+        //     system_script(WIFI_AP_ON);
+        // } else {
+        //     system_script(WIFI_STA_ON);
+        // }
     }
 }
 

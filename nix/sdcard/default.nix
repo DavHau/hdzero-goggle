@@ -113,7 +113,7 @@ stdenv.mkDerivation {
     dragonsecboot -pack "$COMMON_BOARD_DIR/boot_package.cfg"
 
     fallocate -l 16M config.fat32
-    mformat -i config.fat32 ::
+    mformat -v  oz-config -i config.fat32 ::
     mcopy -i config.fat32 ${./setting.ini} ::/setting.ini
 
     BUILD_DIR="$PWD" \

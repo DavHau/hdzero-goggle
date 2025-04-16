@@ -66,7 +66,7 @@
   services.openssh.settings.PermitRootLogin = "yes";
   networking.firewall.enable = false;
   environment.systemPackages = [
-    packages.goggle-app
+    packages.goggle-app-nix
     packages.hdzero-scripts
     pkgs.bat
     # pkgs.haveged

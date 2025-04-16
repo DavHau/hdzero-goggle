@@ -12,6 +12,8 @@
     hdzero-goggle-buildroot.flake = false;  # this input doesn't contain a flake.nix
     hdzero-goggle-linux-src.url = "git+https://github.com/DavHau/hdzero-goggle-linux?shallow=true&ref=hdzero";
     hdzero-goggle-linux-src.flake = false;
+    minIni-src.url = "git+https://github.com/compuphase/minIni?shallow=true";
+    minIni-src.flake = false;
     # A similar board with several supported kernels.
     tinyvision-src.url = "git+https://github.com/YuzukiHD/TinyVision?shallow=true";
     tinyvision-src.flake = false;
@@ -23,6 +25,7 @@
     nix-filter,
     hdzero-goggle-buildroot,
     hdzero-goggle-linux-src,
+    minIni-src,
     tinyvision-src,
   }: let
     # Currently can only support x86_64-linux builders, due to the hardcoded toolchain
@@ -66,7 +69,7 @@
       };
 
       goggle-app-nix = pkgsArm.callPackage ./nix/goggle-app-nix {
-        inherit hdzero-goggle-src nix-filter;
+        inherit hdzero-goggle-src nix-filter minIni-src;
       };
 
       emulate = pkgs.callPackage ./nix/emulate {
@@ -102,8 +105,7 @@
       };
 
       rootfs-nixos = pkgsArm.callPackage ./nix/rootfs-nixos {
-        inherit hdzero-goggle-buildroot nix-filter;
-        inherit (self.packages.${system}) hdzero-scripts;
+        inherit nix-filter;
         kernel = self.packages.${system}.kernel;
         goggle-app = self.packages.${system}.goggle-app-nix;
         machine = self.nixosConfigurations.hdzero;
@@ -169,6 +171,10 @@
 
       # tools to extract files from ext images. currently not used.
       extfstools = pkgs.callPackage ./nix/extfstools.nix { };
+
+      ini-read = pkgsArm.callPackage ./packages/ini-read {
+        inherit minIni-src;
+      };
     };
 
     # a dev environment which can be entered via `nix develop .`

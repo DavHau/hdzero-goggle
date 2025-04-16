@@ -23,6 +23,7 @@
 
   # flake inputs
   nix-filter,
+  minIni-src,
 
   # defined by this project
   hdzero-goggle-src,
@@ -38,12 +39,6 @@ let
     repo = "lvgl";
     rev = "v8.4.0";
     hash = "sha256-9IrcWUUsem3so8trM+0odNWpuqVEdtkqXOfJsV9kFFM=";
-  };
-  minIni-src = fetchFromGitHub {
-    owner = "compuphase";
-    repo = "minIni";
-    rev = "1bb6557030964c921da374e6541e6acb965588e2";  # v1.5 + bugfix
-    hash = "sha256-3ye3nKY6wkx1KE0flaJG3I/iMqx0mYfL5D8fKCAb2Cg=";
   };
   softwinnerIncludes = [
     # copied from CMakeLists.txt

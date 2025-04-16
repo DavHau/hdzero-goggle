@@ -38,6 +38,24 @@
         "url": "https://github.com/DavHau/hdzero-goggle-linux"
       }
     },
+    "minIni-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1714131782,
+        "narHash": "sha256-3ye3nKY6wkx1KE0flaJG3I/iMqx0mYfL5D8fKCAb2Cg=",
+        "ref": "refs/heads/master",
+        "rev": "1bb6557030964c921da374e6541e6acb965588e2",
+        "revCount": 24,
+        "shallow": false,
+        "type": "git",
+        "url": "https://github.com/compuphase/minIni"
+      },
+      "original": {
+        "shallow": false,
+        "type": "git",
+        "url": "https://github.com/compuphase/minIni"
+      }
+    },
     "nix-filter": {
       "locked": {
         "lastModified": 1731533336,
@@ -90,6 +108,7 @@
       "inputs": {
         "hdzero-goggle-buildroot": "hdzero-goggle-buildroot",
         "hdzero-goggle-linux-src": "hdzero-goggle-linux-src",
+        "minIni-src": "minIni-src",
         "nix-filter": "nix-filter",
         "nixpkgs": "nixpkgs",
         "nixpkgs_22_05": "nixpkgs_22_05",
