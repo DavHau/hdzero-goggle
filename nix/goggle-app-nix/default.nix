@@ -39,6 +39,12 @@ let
     rev = "v8.4.0";
     hash = "sha256-9IrcWUUsem3so8trM+0odNWpuqVEdtkqXOfJsV9kFFM=";
   };
+  minIni-src = fetchFromGitHub {
+    owner = "compuphase";
+    repo = "minIni";
+    rev = "1bb6557030964c921da374e6541e6acb965588e2";  # v1.5 + bugfix
+    hash = "sha256-3ye3nKY6wkx1KE0flaJG3I/iMqx0mYfL5D8fKCAb2Cg=";
+  };
   softwinnerIncludes = [
     # copied from CMakeLists.txt
     "lib/softwinner/include/system/public/include"
@@ -138,8 +144,9 @@ stdenv.mkDerivation {
       "lib/esp-loader"
       "lib/linux"
       "lib/log"
-      "lib/lvgl"
-      "lib/minIni"
+      "lib/lvgl/CMakeLists.txt"
+      "lib/lvgl/lv_conf.h"
+      "lib/minIni/CMakeLists.txt"
     ];
   };
   passthru = {patchedLibs = softwinnerLibs;};
@@ -207,9 +214,10 @@ stdenv.mkDerivation {
         '#define SETTING_INI "/mnt/app/setting.ini"' \
         '#define SETTING_INI "/mnt/config/setting.ini"'
 
-    rm -r lib/lvgl/lvgl
     cp -r ${lvgl-src} lib/lvgl/lvgl
-    chmod +w -R lib/lvgl
+    cp -r ${minIni-src}/dev lib/minIni/src
+    chmod +w -R lib/{lvgl,minIni}
+    rm lib/minIni/src/test*
   '';
   preBuild =
     let

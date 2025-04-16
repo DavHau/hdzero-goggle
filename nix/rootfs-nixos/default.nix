@@ -10,14 +10,12 @@
   fakeroot,
 
   # flake inputs
-  hdzero-goggle-buildroot,
   nix-filter,
 
   # from this project
   breakpointHook,
   goggle-app,
   kernel,
-  hdzero-scripts,
   machine,
 }:
 let
