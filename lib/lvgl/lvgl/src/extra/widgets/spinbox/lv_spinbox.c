@@ -460,7 +460,7 @@ static void lv_spinbox_updatevalue(lv_obj_t * obj)
     }
 
     int32_t i;
-    char digits[LV_SPINBOX_MAX_DIGIT_COUNT + 5];
+    char digits[LV_SPINBOX_MAX_DIGIT_COUNT + 4];
     /*Convert the numbers to string (the sign is already handled so always covert positive number)*/
     lv_snprintf(digits, sizeof(digits), "%" LV_PRId32, LV_ABS(spinbox->value));
 
