@@ -16,6 +16,7 @@
     "imx415_mipi"
     "vin_v4l2"
     "sunxi-wlan"
+    "gpio_keys"
   ];
   systemd.services.hdzero = {
     description = "hdzero goggle app";

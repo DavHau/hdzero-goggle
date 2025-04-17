@@ -19,6 +19,6 @@ runCommand "kernel-modules" {} ''
   cp -r ${kernel}/lib/modules/${kernel.modDirVersion}/* $installDir
   chmod +w -R $installDir
   cp \
-    ${koDir}/{disp,gpio_keys_hdzero,hdzero,mcp3021,nct75,rotary_encoder,w25q128,xradio_core,xradio_mac}.ko \
+    ${koDir}/hdzero.ko \
     $installDir/
 ''

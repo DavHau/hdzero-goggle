@@ -55,8 +55,6 @@ in
       }
       EOF
       modprobe sunxi-wlan
-      modprobe xradio-mac
-      modprobe xradio-core
       modprobe xradio-wlan
       ifconfig wlan0 up || :
       sleep 1
