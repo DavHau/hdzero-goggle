@@ -79,6 +79,11 @@
         # inherit hdzero-goggle-linux-src;
       };
 
+      kernel-modules = pkgs.callPackage ./nix/kernel-modules.nix {
+        inherit hdzero-goggle-src nix-filter;
+        inherit (self.packages.${system}) kernel;
+      };
+
       # the kernel built with nix
       kernel = nixpkgs_22_05.legacyPackages.${system}.pkgsCross.armv7l-hf-multiplatform.callPackage ./nix/kernel {
         inherit hdzero-goggle-linux-src;

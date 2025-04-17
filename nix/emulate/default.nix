@@ -10,8 +10,17 @@
   kernel,
   pkgsLinux,
   rootfs,
-}:
+} @ args:
 let
+  rootfs = args.rootfs.override (old: {
+    machine = old.machine.extendModules {
+      modules = [{
+        # no config partition in emulator
+        fileSystems."/mnt/config".enable = false;
+      }];
+    };
+  });
+
   linuxVer = "4.9.118";
 
   linuxSrc = fetchzip {

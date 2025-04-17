@@ -26,7 +26,7 @@ let
     root = ../../mkapp/app/ko;
   };
   busybox = pkgs.pkgsStatic.busybox;
-  arbianFirmware = fetchFromGitHub {
+  armbianFirmware = fetchFromGitHub {
     owner = "armbian";
     repo = "firmware";
     rev = "4050e02da2dce2b74c97101f7964ecfb962f5aec";
@@ -169,7 +169,7 @@ runCommand "rootfs-nix" {
   done
 
   mkdir -p fs/etc/firmware
-  cp ${arbianFirmware}/xr819/*.bin fs/etc/firmware/
+  cp ${armbianFirmware}/xr819/*.bin fs/etc/firmware/
 
   for path in $(find ${hdzg-os-files} ! -type d); do
     # continue if path in ignore

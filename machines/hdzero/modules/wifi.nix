@@ -1,17 +1,34 @@
 {
+  lib,
   pkgs,
   packages,
   ...
 }:
 let
-  koDir = "${../../../mkapp/app/ko}";
+  armbianFirmware = pkgs.fetchFromGitHub {
+    owner = "armbian";
+    repo = "firmware";
+    rev = "4050e02da2dce2b74c97101f7964ecfb962f5aec";
+    hash = "sha256-wc4xyNtUlONntofWJm8/w0KErJzXKHijOyh9hAYTCoU=";
+  };
+
+  xr819Firmware = pkgs.runCommand "xr819-firmware" {} ''
+    mkdir -p $out/lib/firmware
+    cp -r ${armbianFirmware}/xr819 $out/lib/firmware/xr819
+  '';
 in
 {
+  # override needed because we have no ipv6
+  systemd.services.dhcpcd.serviceConfig.ReadWritePaths = lib.mkForce ["/proc/sys/net/ipv4"];
+  # hardware.firmware is missing if udev is disabled
+  systemd.tmpfiles.settings.xradio-firmware."/lib/firmware".L.argument =
+    "${xr819Firmware}/lib/firmware";
   systemd.services.wifi = {
     description = "HDZero WiFi";
     wantedBy = [ "multi-user.target" ];
     after = [ "network.target" ];
     path = [
+      pkgs.kmod
       pkgs.bash
       pkgs.busybox
       pkgs.wpa_supplicant
@@ -37,13 +54,12 @@ in
         psk="$sta_passwd"
       }
       EOF
-
       modprobe sunxi-wlan
-      insmod ${koDir}/xradio_mac.ko || :
-      insmod ${koDir}/xradio_core.ko || :
-      insmod ${koDir}/xradio_wlan.ko || :
+      modprobe xradio-mac
+      modprobe xradio-core
+      modprobe xradio-wlan
       ifconfig wlan0 up || :
-      udhcpc -x hostname:HDZero -x 0x3d:76931FAC9DAB2B -r 192.168.2.122 -i wlan0 -f || : &
+      sleep 1
       wpa_supplicant -Dnl80211 -iwlan0 -c /tmp/wifi.conf
       # /mnt/app/app/record/rtspLive &
     '';

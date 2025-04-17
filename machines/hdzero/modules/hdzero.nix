@@ -3,9 +3,26 @@
   packages,
   ...
 }: {
+  boot.extraModulePackages = [
+    packages.kernel-modules
+  ];
+  boot.kernelModules = [
+    "videobuf2-core"
+    "videobuf2-memops"
+    "videobuf2-dma-contig"
+    "videobuf2-v4l2"
+    "vin_io"
+    "tp9950"
+    "imx415_mipi"
+    "vin_v4l2"
+    "sunxi-wlan"
+  ];
   systemd.services.hdzero = {
     description = "hdzero goggle app";
     wantedBy = [ "multi-user.target" ];
+    after = ["mnt-config.mount" "systemd-modules-load.service" "systemd-tmpfiles-setup.service"];
+    before = ["systemd-sysctl.service"];
+    unitConfig.DefaultDependencies = false;
     serviceConfig = {
       Restart = "always";
       RestartSec = 5;
@@ -16,16 +33,7 @@
       packages.hdzero-scripts
     ];
     preStart = ''
-      modprobe videobuf2-core
-      modprobe videobuf2-memops
-      modprobe videobuf2-dma-contig
-      modprobe videobuf2-v4l2
-      modprobe vin_io
-      modprobe tp9950
-      modprobe imx415_mipi
       insmod /mnt/app/ko/hdzero.ko || :
-      modprobe vin_v4l2
-      modprobe sunxi-wlan
       usleep 200000
       echo 0x0300B098 0x00775577 > /sys/class/sunxi_dump/write
       echo 0x0300B0D8 0x22777777 > /sys/class/sunxi_dump/write

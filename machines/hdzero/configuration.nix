@@ -1,4 +1,5 @@
 {
+  config,
   pkgs,
   lib,
   packages,
@@ -14,8 +15,6 @@
 
   # enables mdns
   services.resolved.enable = true;
-  # relax the constraint on sysinit.target
-  systemd.services.systemd-resolved.wantedBy = lib.mkForce [ "multi-user.target" ];
 
   # no udev for now
   services.udev.enable = false;
@@ -41,10 +40,9 @@
   '';
 
   # boot
-  boot.kernelPackages = pkgs.linuxPackagesFor packages.kernel;
-  boot.initrd.enable = false;
-  boot.kernel.enable = false;
   boot.loader.grub.enable = false;
+  boot.initrd.enable = false;
+  boot.kernelPackages = pkgs.linuxPackagesFor packages.kernel;
   boot.postBootCommands = ''
     # fans to max
     echo 0x0300B0fc 0x35517751 > /sys/class/sunxi_dump/write
@@ -53,6 +51,18 @@
     #   tina kern.warn kernel: [ 1213.053354] c=25,a=0x   8eb48,bs=    8,t=     2346us,sp=   1705KB/s
     echo 0 > /sys/devices/platform/soc/sdc0/sunxi_host_filter_w_speed
   '';
+
+  # kernel
+  # TODO: disable kernel instead of overriding initrd with garbage
+  # boot.kernel.enable = false;
+  system.build.initialRamdisk = "foo";
+  system.boot.loader.initrdFile = "bar";
+  system.build.initialRamdiskSecretAppender = "baz";
+  # link kernel modules via systemd-tmpfiles
+  systemd.tmpfiles.settings.kernel-modules."/lib/modules".L.argument =
+    "${packages.kernel-modules}/lib/modules";
+  systemd.services.systemd-modules-load.after = [ "systemd-tmpfiles-setup.service" ];
+
 
   fileSystems."/" = {
     device = "/dev/disk/by-label/nixos";
@@ -68,6 +78,7 @@
   environment.systemPackages = [
     packages.goggle-app-nix
     packages.hdzero-scripts
+    packages.ini-read
     pkgs.bat
     # pkgs.haveged
     pkgs.hostapd

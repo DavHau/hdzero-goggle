@@ -32,3 +32,39 @@ vin_io                 24295  4 vin_v4l2,hdzero,imx415_mipi,tp9950
 videobuf2_dma_contig     5939  1 vin_v4l2
 sunxi_ise               5846  0
 sunxi_eise              5929  0
+
+
+## hdzero systemd critical chain iterations
+
+hdzero.service +5.523s
+└─basic.target @16.763s
+  └─sockets.target @16.733s
+    └─systemd-hostnamed.socket @16.706s
+      └─sysinit.target @16.493s
+        └─systemd-resolved.service @4.004s +12.430s
+          └─systemd-sysctl.service @3.288s +485ms
+            └─systemd-journald.socket @2.734s
+              └─system.slice @2.027s
+                └─-.slice @2.026s
+
+hdzero.service +3.928s
+└─mnt-config.mount @7.457s +541ms
+  └─dev-mmcblk0p3.device @6.947s
+
+
+hdzero.service +2.957s
+└─mnt-config.mount @8.342s +302ms
+  └─dev-mmcblk0p3.device @8.168s
+
+
+hdzero.service +3.483s
+└─systemd-modules-load.service @8.781s +638ms
+  └─systemd-tmpfiles-setup.service @8.504s +234ms
+    └─local-fs.target @8.429s
+      └─run-user-0.mount @22.935s
+        └─local-fs-pre.target @4.679s
+          └─systemd-tmpfiles-setup-dev.service @4.332s +305ms
+            └─systemd-tmpfiles-setup-dev-early.service @3.619s +439ms
+              └─systemd-journald.socket @3.119s
+                └─system.slice @2.448s
+                  └─-.slice @2.439s
