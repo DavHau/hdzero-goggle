@@ -39,8 +39,6 @@
       echo 0x0300B098 0x00775577 > /sys/class/sunxi_dump/write
       echo 0x0300B0D8 0x22777777 > /sys/class/sunxi_dump/write
       echo 0x0300B0fc 0x35517751 > /sys/class/sunxi_dump/write  # fans to max
-      insmod /mnt/app/ko/gpio_keys_hdzero.ko || :
-      insmod /mnt/app/ko/rotary_encoder.ko || :
       dispw -x
       dispw -s vdpo 1080p50
 

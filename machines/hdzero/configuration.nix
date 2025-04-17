@@ -23,7 +23,7 @@
   systemd.services.systemd-random-seed.enable = false;
 
   # users / login
-  users.users.root.initialPassword = "root";
+  users.users.root.initialPassword = "openzero";
   users.mutableUsers = true;
   services.getty.autologinUser = "root";
 
