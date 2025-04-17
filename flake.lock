@@ -38,6 +38,25 @@
         "url": "https://github.com/DavHau/hdzero-goggle-linux"
       }
     },
+    "lvgl-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1675753965,
+        "narHash": "sha256-NYsGGcoAE6IgC/9P+aNyAsYbtlwW7JnHZ2gIORdRPyE=",
+        "ref": "refs/tags/v8.3.5",
+        "rev": "dea7db83e479f7dc903557e9788e1bd8b26cc22c",
+        "revCount": 8165,
+        "shallow": false,
+        "type": "git",
+        "url": "https://github.com/lvgl/lvgl"
+      },
+      "original": {
+        "ref": "refs/tags/v8.3.5",
+        "shallow": false,
+        "type": "git",
+        "url": "https://github.com/lvgl/lvgl"
+      }
+    },
     "minIni-src": {
       "flake": false,
       "locked": {
@@ -108,6 +127,7 @@
       "inputs": {
         "hdzero-goggle-buildroot": "hdzero-goggle-buildroot",
         "hdzero-goggle-linux-src": "hdzero-goggle-linux-src",
+        "lvgl-src": "lvgl-src",
         "minIni-src": "minIni-src",
         "nix-filter": "nix-filter",
         "nixpkgs": "nixpkgs",

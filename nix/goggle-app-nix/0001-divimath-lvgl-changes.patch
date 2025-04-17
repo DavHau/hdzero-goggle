@@ -1,0 +1,25 @@
+From 6d4929b9d8b0ef969a932dc711fa072af84fa7b8 Mon Sep 17 00:00:00 2001
+From: DavHau <hsngrmpf+github@gmail.com>
+Date: Thu, 17 Apr 2025 19:09:45 +0700
+Subject: [PATCH] divimath lvgl changes
+
+---
+ src/extra/widgets/menu/lv_menu.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/extra/widgets/menu/lv_menu.c b/src/extra/widgets/menu/lv_menu.c
+index 78577e770..37ad5492c 100644
+--- a/src/extra/widgets/menu/lv_menu.c
++++ b/src/extra/widgets/menu/lv_menu.c
+@@ -283,7 +283,7 @@ void lv_menu_set_sidebar_page(lv_obj_t * obj, lv_obj_t * page)
+             lv_obj_t * sidebar_cont = lv_obj_class_create_obj(&lv_menu_sidebar_cont_class, obj);
+             lv_obj_class_init_obj(sidebar_cont);
+             lv_obj_move_to_index(sidebar_cont, 1);
+-            lv_obj_set_size(sidebar_cont, LV_PCT(30), LV_PCT(100));
++            lv_obj_set_size(sidebar_cont, LV_PCT(18), LV_PCT(100));
+             lv_obj_set_flex_flow(sidebar_cont, LV_FLEX_FLOW_COLUMN);
+             lv_obj_add_flag(sidebar_cont, LV_OBJ_FLAG_EVENT_BUBBLE);
+             lv_obj_clear_flag(sidebar_cont, LV_OBJ_FLAG_CLICKABLE);
+-- 
+2.48.1
+

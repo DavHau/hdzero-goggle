@@ -12,6 +12,8 @@
     hdzero-goggle-buildroot.flake = false;  # this input doesn't contain a flake.nix
     hdzero-goggle-linux-src.url = "git+https://github.com/DavHau/hdzero-goggle-linux?shallow=true&ref=hdzero";
     hdzero-goggle-linux-src.flake = false;
+    lvgl-src.url = "git+https://github.com/lvgl/lvgl?shallow=true&ref=refs/tags/v8.3.5";
+    lvgl-src.flake = false;
     minIni-src.url = "git+https://github.com/compuphase/minIni?shallow=true";
     minIni-src.flake = false;
     # A similar board with several supported kernels.
@@ -25,6 +27,7 @@
     nix-filter,
     hdzero-goggle-buildroot,
     hdzero-goggle-linux-src,
+    lvgl-src,
     minIni-src,
     tinyvision-src,
   }: let
@@ -69,7 +72,7 @@
       };
 
       goggle-app-nix = pkgsArm.callPackage ./nix/goggle-app-nix {
-        inherit hdzero-goggle-src nix-filter minIni-src;
+        inherit hdzero-goggle-src nix-filter minIni-src lvgl-src;
       };
 
       emulate = pkgs.callPackage ./nix/emulate {

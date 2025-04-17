@@ -27,6 +27,7 @@
 
   # defined by this project
   hdzero-goggle-src,
+  lvgl-src,
 }:
 let
   inherit (lib)
@@ -34,12 +35,6 @@ let
     removeSuffix
     ;
   version = removeSuffix "\n" (readFile (hdzero-goggle-src + "/VERSION"));
-  lvgl-src = fetchFromGitHub {
-    owner = "lvgl";
-    repo = "lvgl";
-    rev = "v8.4.0";
-    hash = "sha256-9IrcWUUsem3so8trM+0odNWpuqVEdtkqXOfJsV9kFFM=";
-  };
   softwinnerIncludes = [
     # copied from CMakeLists.txt
     "lib/softwinner/include/system/public/include"
@@ -213,6 +208,8 @@ stdenv.mkDerivation {
     cp -r ${minIni-src}/dev lib/minIni/src
     chmod +w -R lib/{lvgl,minIni}
     rm lib/minIni/src/test*
+
+    patch -d lib/lvgl/lvgl -p1 -i ${./0001-divimath-lvgl-changes.patch}
   '';
   preBuild =
     let
