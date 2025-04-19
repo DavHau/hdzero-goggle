@@ -8,7 +8,6 @@
   imports = [
     ./modules/wifi.nix
     ./modules/hdzero.nix
-    # ./modules/avahi.nix
   ];
 
   networking.hostName = "hdzero";
