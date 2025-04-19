@@ -13,7 +13,6 @@
   nix-filter,
 
   # from this project
-  breakpointHook,
   goggle-app,
   kernel,
   machine,
@@ -44,7 +43,6 @@ in
     dontInstall = true;
     dontFixup = true;
     nativeBuildInputs = [
-      breakpointHook
       e2fsprogs
       nix
       python3

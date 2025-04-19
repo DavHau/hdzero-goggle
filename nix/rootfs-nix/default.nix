@@ -7,12 +7,12 @@
   autoPatchelfHook,
   lib,
   fetchFromGitHub,
+  pkgsBuildHost,
 
   # inputs
   nix-filter,
 
   # from this project
-  breakpointHook,
   goggle-app,
   hdzero-goggle-buildroot,
   kernel,
@@ -66,16 +66,19 @@ let
   };
 in
 runCommand "rootfs-nix" {
-  nativeBuildInputs = [
-    breakpointHook
+  PATH = lib.makeBinPath [
     rsync
     python3
     e2fsprogs
+    pkgsBuildHost.coreutils
+    pkgsBuildHost.busybox
   ];
   __structuredAttrs = true;
   exportReferencesGraph.closure = includedPrograms;
   passthru = {inherit patchedLibs;};
-} ''
+  builder = pkgs.writeScript "builder" ''
+  . .attrs.sh
+  export out="''${outputs[out]}"
   mkdir -p fs/bin
   # symlink bins to the rootfs
   for store_path in ${toString includedPrograms}; do
@@ -185,10 +188,12 @@ runCommand "rootfs-nix" {
   done
 
   chmod +w -R fs
-  mkfs.ext4 -d ./fs rootfs.ext2 "1024M"
+  mkfs.ext4 -d ./fs rootfs.ext2 1G
 
   mkdir $out
   mv rootfs.ext2 $out/
   mv fs $out/fs
   mv missing-files $out/missing-files
-''
+'';
+}
+""

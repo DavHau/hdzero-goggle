@@ -2,7 +2,6 @@
   stdenv,
   fetchFromGitHub,
   cmake,
-  breakpointHook,
   vim,
   ripgrep
 }:
@@ -18,7 +17,6 @@ stdenv.mkDerivation {
   };
   nativeBuildInputs = [
     cmake
-    breakpointHook
     vim
     ripgrep
   ];

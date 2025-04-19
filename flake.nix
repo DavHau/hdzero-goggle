@@ -5,6 +5,7 @@
 {
   inputs = {
     # nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+    nixpkgs_unstable.url = "git+https://github.com/DavHau/nixpkgs?shallow=1&ref=dave";
     nixpkgs.url = "git+https://github.com/DavHau/nixpkgs?shallow=1&ref=dave";
     nixpkgs_22_05.url = "github:nixos/nixpkgs/nixos-22.05";
     nix-filter.url = "github:numtide/nix-filter";
@@ -12,6 +13,8 @@
     hdzero-goggle-buildroot.flake = false;  # this input doesn't contain a flake.nix
     hdzero-goggle-linux-src.url = "git+https://github.com/DavHau/hdzero-goggle-linux?shallow=true&ref=hdzero";
     hdzero-goggle-linux-src.flake = false;
+    kernel-5-4-src.url = "git+https://github.com/DavHau/hdzero-goggle-linux?shallow=true&ref=tina54";
+    kernel-5-4-src.flake = false;
     lvgl-src.url = "git+https://github.com/lvgl/lvgl?shallow=true&ref=refs/tags/v8.3.5";
     lvgl-src.flake = false;
     minIni-src.url = "git+https://github.com/compuphase/minIni?shallow=true";
@@ -23,10 +26,12 @@
   outputs = {
     self,
     nixpkgs,
+    nixpkgs_unstable,
     nixpkgs_22_05,
     nix-filter,
     hdzero-goggle-buildroot,
     hdzero-goggle-linux-src,
+    kernel-5-4-src,
     lvgl-src,
     minIni-src,
     tinyvision-src,
@@ -93,11 +98,17 @@
         breakpointHook = pkgs.breakpointHook;
       };
 
-      # linux kernel version 4.9.191 from a similar board which is properly open sourced
-      kernel-tinyvision = nixpkgs_22_05.legacyPackages.${system}.pkgsCross.armv7l-hf-multiplatform.callPackage ./nix/kernel-tinyvision {
-        inherit tinyvision-src;
+      # experiment with kernel 5.4
+      kernel_5_4 = nixpkgs_22_05.legacyPackages.${system}.pkgsCross.armv7l-hf-multiplatform.callPackage ./nix/kernel_5_4 {
+        inherit kernel-5-4-src;
         breakpointHook = pkgs.breakpointHook;
       };
+
+      # linux kernel version 4.9.191 from a similar board which is properly open sourced
+      # kernel = nixpkgs_22_05.legacyPackages.${system}.pkgsCross.armv7l-hf-multiplatform.callPackage ./nix/kernel {
+      #   inherit hdzero-goggle-linux-src;
+      #   breakpointHook = pkgs.breakpointHook;
+      # };
 
       # only the rootfs etx2 image built by wrapping buildroot
       rootfs = pkgs.callPackage ./nix/rootfs {
@@ -150,12 +161,24 @@
         init = "/init";
       };
 
+      sdcard-recovery = pkgs.callPackage ./nix/sdcard-recovery.nix {
+        inherit (self.packages.${system}) upstream-firmware-archive;
+      };
+
       xradio-driver = pkgsArm.callPackage ./nix/xradio-driver {
         inherit (self.packages.${system}) kernel;
       };
 
+      upstream-firmware-archive = pkgs.fetchzip {
+        url = "https://www.hd-zero.com/_files/archives/967e02_9e6db8079a354f86979994a4ed28ab59.zip?dn=HDZEROGOGGLE_Rev20250319.zip";
+        hash = "sha256-x/6MKHIr4tvItMR2/+B03jkaPL3fpaMrtrA0l++gJYM=";
+        stripRoot=false;
+      };
+
       # filesystem extracted from the original HDZG_OS.bin
-      hdzg-os-files = pkgs.callPackage ./nix/hdzg-os-files.nix {};
+      hdzg-os-files = nixpkgs_unstable.legacyPackages.x86_64-linux.callPackage ./nix/hdzg-os-files.nix {
+        inherit (self.packges.${system}) upstream-firmware-archive;
+      };
 
       # some bash scripts which teh goggle app depends on
       hdzero-scripts = pkgs.callPackage ./nix/hdzero-scripts {};
@@ -196,6 +219,7 @@
       };
       modules = [{
         nixpkgs.pkgs = pkgsArm;
+        nixpkgs.system = "armv7l-linux";
         imports = [./machines/hdzero/configuration.nix];
       }];
     };

@@ -38,6 +38,25 @@
         "url": "https://github.com/DavHau/hdzero-goggle-linux"
       }
     },
+    "kernel-5-4-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1745035448,
+        "narHash": "sha256-+QhYV759WPw68Jl3qcoiTWtzRuglNIbJUR1Z2zgiqKo=",
+        "ref": "tina54",
+        "rev": "bc2e00cb0665d01f6c7b5dc3623d0837232ea5d3",
+        "revCount": 881117,
+        "shallow": false,
+        "type": "git",
+        "url": "https://github.com/DavHau/hdzero-goggle-linux"
+      },
+      "original": {
+        "ref": "tina54",
+        "shallow": false,
+        "type": "git",
+        "url": "https://github.com/DavHau/hdzero-goggle-linux"
+      }
+    },
     "lvgl-src": {
       "flake": false,
       "locked": {
@@ -123,15 +142,34 @@
         "type": "github"
       }
     },
+    "nixpkgs_unstable": {
+      "locked": {
+        "lastModified": 1743870327,
+        "narHash": "sha256-S4A0kmaVNXadL5AkyEJKyrw+MImC7GZtg91fIA8H/o8=",
+        "ref": "dave",
+        "rev": "2e7e181351a2dc9ba6e51baf4d00cd4cfb548321",
+        "shallow": true,
+        "type": "git",
+        "url": "https://github.com/DavHau/nixpkgs"
+      },
+      "original": {
+        "ref": "dave",
+        "shallow": true,
+        "type": "git",
+        "url": "https://github.com/DavHau/nixpkgs"
+      }
+    },
     "root": {
       "inputs": {
         "hdzero-goggle-buildroot": "hdzero-goggle-buildroot",
         "hdzero-goggle-linux-src": "hdzero-goggle-linux-src",
+        "kernel-5-4-src": "kernel-5-4-src",
         "lvgl-src": "lvgl-src",
         "minIni-src": "minIni-src",
         "nix-filter": "nix-filter",
         "nixpkgs": "nixpkgs",
         "nixpkgs_22_05": "nixpkgs_22_05",
+        "nixpkgs_unstable": "nixpkgs_unstable",
         "tinyvision-src": "tinyvision-src"
       }
     },

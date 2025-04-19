@@ -31,7 +31,6 @@
   kernel,
 
   # debug
-  breakpointHook,
   vim,
   ripgrep,
   pkgs,
@@ -109,7 +108,6 @@ let
         mtdutils
         e2fsprogs
         util-linux
-        breakpointHook
         vim
         ripgrep
       ];

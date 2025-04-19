@@ -20,6 +20,7 @@
   zlib,
   ncurses5,
   fetchFromGitHub,
+  gcc,
 
   # flake inputs
   nix-filter,
@@ -55,7 +56,7 @@ let
     "lib/softwinner/include/middleware/media/LIBRARY/libisp"
   ];
   softwinnerLibs = stdenv.mkDerivation {
-    name = "hdzero-app-libs-patched";
+    name = "softwinner-libs";
     src = nix-filter.lib {
       root = hdzero-goggle-src;
       include = softwinnerIncludes ++ [
@@ -100,16 +101,15 @@ let
     ];
     dontBuild = true;
     buildInputs = [
-      libgcc
+      gcc.cc.lib
       stdenv.cc.cc.lib
       zlib
       alsa-lib
     ];
     nativeBuildInputs = [
       autoPatchelfHook
-      breakpointHook
     ];
-    installPhase = ''
+    installPhase = lib.replaceStrings ["--replace-fail"] ["--replace"] ''
       mkdir -p $out/lib
       cp -r lib/softwinner/lib/* $out/lib/
       mkdir -p $out/include
@@ -139,13 +139,12 @@ stdenv.mkDerivation {
       "lib/minIni/CMakeLists.txt"
     ];
   };
-  passthru = {patchedLibs = softwinnerLibs;};
+  passthru = {inherit softwinnerLibs;};
   nativeBuildInputs = [
     cmake
     mtdutils
     e2fsprogs
     autoPatchelfHook
-    breakpointHook
     vim
     ripgrep
     which
@@ -165,8 +164,6 @@ stdenv.mkDerivation {
     "stackprotector"
     "fortify"
     "fortify3"
-    "fortify3"
-    # "pic"
     "strictoverflow"
     "bindnow"
     "zerocallusedregs"
@@ -179,7 +176,7 @@ stdenv.mkDerivation {
   patchelfFlags = [
     "--replace-needed libc.so libc.so.6"
   ];
-  postPatch = ''
+  postPatch = lib.replaceStrings ["--replace-fail"] ["--replace"] ''
     substituteInPlace ./mkapp/mkapp_ota.sh \
       --replace-fail "APP_VERSION=\$(get_app_version)" "APP_VERSION=${version}"
     patchShebangs ./mkapp/mkapp_ota.sh
@@ -238,9 +235,10 @@ stdenv.mkDerivation {
         export CPATH="$CPATH:$include"
       done
       # export NIX_CFLAGS_COMPILE="$NIX_CFLAGS_COMPILE -Wno-unused-result -fsanitize=address"
-      export NIX_CFLAGS_COMPILE="$NIX_CFLAGS_COMPILE -Wno-unused-result"
+      export NIX_CFLAGS_COMPILE="$NIX_CFLAGS_COMPILE -Wno-unused-result -Wno-stringop-overread -Wno-stringop-overflow"
       export NIX_LDFLAGS="$NIX_LDFLAGS ${toString ldflags}"
-      export PATH="$PATH:${pkgsBuildBuild.binutils}/bin"
+      export PATH="$PATH:${pkgsBuildBuild.binutils-unwrapped}/bin"
+      ${pkgsBuildBuild.binutils-unwrapped}/bin/size --help
     '';
   postBuild = ''
     interpreter=$(echo ${glibc.out}/lib/ld-linux-*.so.*)

@@ -13,7 +13,7 @@ stdenv.mkDerivation {
   };
   postPatch = ''
     for makefile in ./**/Makefile; do
-      substituteInPlace "$makefile" --replace-fail " -static" " "
+      substituteInPlace "$makefile" --replace " -static" " "
     done
   '';
   buildPhase = ''

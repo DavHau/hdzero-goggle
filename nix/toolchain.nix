@@ -16,7 +16,7 @@ stdenv.mkDerivation {
     autoPatchelfHook
   ];
   buildInputs = [
-    libgcc.lib
+    libgcc
   ];
   buildPhase = ''
     cp -r . $out
