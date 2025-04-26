@@ -87,6 +87,11 @@
         # inherit hdzero-goggle-linux-src;
       };
 
+      emulate_5_4 = pkgs.callPackage ./nix/emulate_5_4 {
+        inherit pkgsArm;
+        kernel = self.packages.${system}.kernel;
+      };
+
       kernel-modules = pkgs.callPackage ./nix/kernel-modules.nix {
         inherit hdzero-goggle-src nix-filter;
         inherit (self.packages.${system}) kernel;
@@ -97,6 +102,26 @@
         inherit hdzero-goggle-linux-src;
         breakpointHook = pkgs.breakpointHook;
       };
+
+      # kernel = (pkgsArm.linux_6_12.override {
+      #   defconfig = "sunxi_defconfig";
+      #   autoModules = false;
+      #   extraConfig = ''
+      #     CONFIG_SERIAL_8250 y
+      #     CONFIG_SERIAL_8250_CONSOLE y
+      #     CONFIG_SERIAL_8250_earlycon y
+      #     CONFIG_EARLY_PRINTK y
+      #     CONFIG_DEBUG_UART_PHYS 0x01C28000
+      #     CONFIG_DEBUG_SUNXI_UART0 y
+      #     CONFIG_DEBUG_LL_INCLUDE "debug/8250.S"
+      #   '';
+      # }).overrideAttrs (old: {
+      #   installTargets = old.installTargets ++ [ "uinstall" ];
+      #   buildFlags = old.buildFlags ++ [
+      #     "uImage"
+      #     "LOADADDR=0x40008000"
+      #   ];
+      # });
 
       # experiment with kernel 5.4
       kernel_5_4 = nixpkgs_22_05.legacyPackages.${system}.pkgsCross.armv7l-hf-multiplatform.callPackage ./nix/kernel_5_4 {

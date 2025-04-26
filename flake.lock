@@ -41,11 +41,11 @@
     "kernel-5-4-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1745035448,
-        "narHash": "sha256-+QhYV759WPw68Jl3qcoiTWtzRuglNIbJUR1Z2zgiqKo=",
+        "lastModified": 1745512286,
+        "narHash": "sha256-h7H0tz1UMzZ1NkM5R/0MKujMUhj5sX7ph2rArWXgeqc=",
         "ref": "tina54",
-        "rev": "bc2e00cb0665d01f6c7b5dc3623d0837232ea5d3",
-        "revCount": 881117,
+        "rev": "87c6cc7b7fef32ebcd7c5fc38b129efa180594da",
+        "revCount": 881120,
         "shallow": false,
         "type": "git",
         "url": "https://github.com/DavHau/hdzero-goggle-linux"

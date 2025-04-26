@@ -61,6 +61,7 @@ stdenv.mkDerivation {
     cp -v ${appExt2File} .
     cp -v ${uImage} .
     cp -v "${dtbDir}/hdzero_goggle.dtb" .
+    # cp -v "${kernel}/dtbs/sun8iw16p1-soc.dtb" hdzero_goggle.dtb
 
     chmod +w app.ext2
 
