@@ -109,11 +109,8 @@
       #   extraConfig = ''
       #     CONFIG_SERIAL_8250 y
       #     CONFIG_SERIAL_8250_CONSOLE y
-      #     CONFIG_SERIAL_8250_earlycon y
+      #     CONFIG_SERIAL_EARLYCON y
       #     CONFIG_EARLY_PRINTK y
-      #     CONFIG_DEBUG_UART_PHYS 0x01C28000
-      #     CONFIG_DEBUG_SUNXI_UART0 y
-      #     CONFIG_DEBUG_LL_INCLUDE "debug/8250.S"
       #   '';
       # }).overrideAttrs (old: {
       #   installTargets = old.installTargets ++ [ "uinstall" ];
@@ -184,6 +181,17 @@
         goggle-app = self.packages.${system}.goggle-app-nix;
         rootfs = self.packages.${system}.rootfs-nixos;
         init = "/init";
+      };
+
+      sdcard-debug = pkgs.callPackage ./nix/sdcard/debug.nix {
+        inherit hdzero-goggle-buildroot pkgsArm;
+        inherit (self.packages.${system})
+          hdzero-goggle-tools
+          kernel
+          rootfs
+          ;
+        goggle-app = self.packages.${system}.goggle-app-nix;
+        init = "/bin/sh";
       };
 
       sdcard-recovery = pkgs.callPackage ./nix/sdcard-recovery.nix {

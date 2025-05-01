@@ -68,3 +68,13 @@ hdzero.service +3.483s
               └─systemd-journald.socket @3.119s
                 └─system.slice @2.448s
                   └─-.slice @2.439s
+
+
+Linux 6.12 debug:
+
+[   11.437216] platform 7022000.pinctrl: deferred probe pending: platform: wait for supplier /clocks/cpurpio
+[   11.447848] platform 300b000.pinctrl: deferred probe pending: platform: wait for supplier /clocks/pio
+[   11.458020] platform 6600800.vind: deferred probe pending: platform: wait for supplier /soc@03000000/pinctrl@0300b000/csi_mclk1@1
+[   11.470849] platform 4020000.sdmmc: deferred probe pending: platform: wait for supplier /soc@03000000/pinctrl@0300b000/sdc0@3
+[   11.483284] platform cpufreq-dt: deferred probe pending: (reason unknown)
+[   11.490775] platform pmu: deferred probe pending: armv7-pmu: unable to count PMU IRQs
