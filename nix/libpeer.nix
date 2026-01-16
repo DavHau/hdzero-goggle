@@ -3,7 +3,7 @@
   fetchFromGitHub,
   cmake,
   vim,
-  ripgrep
+  ripgrep,
 }:
 stdenv.mkDerivation {
   pname = "libpeer";

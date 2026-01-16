@@ -26,14 +26,13 @@
         "narHash": "sha256-sYYZTl6rjDeGtI2HiT2jSAULNcwECrSa4lz49RsreyU=",
         "ref": "hdzero",
         "rev": "2058eb761002655558d4e9f6a9e4d2aabcabb8c0",
-        "revCount": 644471,
-        "shallow": false,
+        "shallow": true,
         "type": "git",
         "url": "https://github.com/DavHau/hdzero-goggle-linux"
       },
       "original": {
         "ref": "hdzero",
-        "shallow": false,
+        "shallow": true,
         "type": "git",
         "url": "https://github.com/DavHau/hdzero-goggle-linux"
       }
@@ -45,14 +44,13 @@
         "narHash": "sha256-h7H0tz1UMzZ1NkM5R/0MKujMUhj5sX7ph2rArWXgeqc=",
         "ref": "tina54",
         "rev": "87c6cc7b7fef32ebcd7c5fc38b129efa180594da",
-        "revCount": 881120,
-        "shallow": false,
+        "shallow": true,
         "type": "git",
         "url": "https://github.com/DavHau/hdzero-goggle-linux"
       },
       "original": {
         "ref": "tina54",
-        "shallow": false,
+        "shallow": true,
         "type": "git",
         "url": "https://github.com/DavHau/hdzero-goggle-linux"
       }
@@ -64,14 +62,13 @@
         "narHash": "sha256-NYsGGcoAE6IgC/9P+aNyAsYbtlwW7JnHZ2gIORdRPyE=",
         "ref": "refs/tags/v8.3.5",
         "rev": "dea7db83e479f7dc903557e9788e1bd8b26cc22c",
-        "revCount": 8165,
-        "shallow": false,
+        "shallow": true,
         "type": "git",
         "url": "https://github.com/lvgl/lvgl"
       },
       "original": {
         "ref": "refs/tags/v8.3.5",
-        "shallow": false,
+        "shallow": true,
         "type": "git",
         "url": "https://github.com/lvgl/lvgl"
       }
@@ -83,13 +80,12 @@
         "narHash": "sha256-3ye3nKY6wkx1KE0flaJG3I/iMqx0mYfL5D8fKCAb2Cg=",
         "ref": "refs/heads/master",
         "rev": "1bb6557030964c921da374e6541e6acb965588e2",
-        "revCount": 24,
-        "shallow": false,
+        "shallow": true,
         "type": "git",
         "url": "https://github.com/compuphase/minIni"
       },
       "original": {
-        "shallow": false,
+        "shallow": true,
         "type": "git",
         "url": "https://github.com/compuphase/minIni"
       }
@@ -111,19 +107,19 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1743870327,
-        "narHash": "sha256-S4A0kmaVNXadL5AkyEJKyrw+MImC7GZtg91fIA8H/o8=",
-        "ref": "dave",
-        "rev": "2e7e181351a2dc9ba6e51baf4d00cd4cfb548321",
+        "lastModified": 1768323494,
+        "narHash": "sha256-yBXJLE6WCtrGo7LKiB6NOt6nisBEEkguC/lq/rP3zRQ=",
+        "ref": "nixos-25.11",
+        "rev": "2c3e5ec5df46d3aeee2a1da0bfedd74e21f4bf3a",
         "shallow": true,
         "type": "git",
-        "url": "https://github.com/DavHau/nixpkgs"
+        "url": "https://github.com/nixos/nixpkgs"
       },
       "original": {
-        "ref": "dave",
+        "ref": "nixos-25.11",
         "shallow": true,
         "type": "git",
-        "url": "https://github.com/DavHau/nixpkgs"
+        "url": "https://github.com/nixos/nixpkgs"
       }
     },
     "nixpkgs_22_05": {
@@ -144,19 +140,19 @@
     },
     "nixpkgs_unstable": {
       "locked": {
-        "lastModified": 1743870327,
-        "narHash": "sha256-S4A0kmaVNXadL5AkyEJKyrw+MImC7GZtg91fIA8H/o8=",
-        "ref": "dave",
-        "rev": "2e7e181351a2dc9ba6e51baf4d00cd4cfb548321",
+        "lastModified": 1768305791,
+        "narHash": "sha256-AIdl6WAn9aymeaH/NvBj0H9qM+XuAuYbGMZaP0zcXAQ=",
+        "ref": "nixos-unstable",
+        "rev": "1412caf7bf9e660f2f962917c14b1ea1c3bc695e",
         "shallow": true,
         "type": "git",
-        "url": "https://github.com/DavHau/nixpkgs"
+        "url": "https://github.com/nixos/nixpkgs"
       },
       "original": {
-        "ref": "dave",
+        "ref": "nixos-unstable",
         "shallow": true,
         "type": "git",
-        "url": "https://github.com/DavHau/nixpkgs"
+        "url": "https://github.com/nixos/nixpkgs"
       }
     },
     "root": {
@@ -176,17 +172,16 @@
     "tinyvision-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1742486109,
-        "narHash": "sha256-sq4oZM5drU7QEgP+yYQE4wCCWp5Y4iyCEZA2mjysx9E=",
+        "lastModified": 1755096120,
+        "narHash": "sha256-jcBiexhCAufH7x96zHcTG9MCH8tX0WEfYdLLkQYh1ts=",
         "ref": "refs/heads/main",
-        "rev": "ba3bae2cc6af787854635e7bb68399aee99cfd53",
-        "revCount": 192,
-        "shallow": false,
+        "rev": "356b94946a4887b721423f41711c7bc94fe74a18",
+        "shallow": true,
         "type": "git",
         "url": "https://github.com/YuzukiHD/TinyVision"
       },
       "original": {
-        "shallow": false,
+        "shallow": true,
         "type": "git",
         "url": "https://github.com/YuzukiHD/TinyVision"
       }

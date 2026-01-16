@@ -4,257 +4,217 @@
 # In case of questions, feel free to ask @DavHau
 {
   inputs = {
-    # nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
-    nixpkgs_unstable.url = "git+https://github.com/DavHau/nixpkgs?shallow=1&ref=dave";
-    nixpkgs.url = "git+https://github.com/DavHau/nixpkgs?shallow=1&ref=dave";
+    nixpkgs.url = "git+https://github.com/nixos/nixpkgs?shallow=1&ref=nixos-25.11";
+    nixpkgs_unstable.url = "git+https://github.com/nixos/nixpkgs?shallow=1&ref=nixos-unstable";
     nixpkgs_22_05.url = "github:nixos/nixpkgs/nixos-22.05";
     nix-filter.url = "github:numtide/nix-filter";
     hdzero-goggle-buildroot.url = "git+https://github.com/bkleiner/hdzero-goggle-buildroot?shallow=1&submodules=1";
-    hdzero-goggle-buildroot.flake = false;  # this input doesn't contain a flake.nix
-    hdzero-goggle-linux-src.url = "git+https://github.com/DavHau/hdzero-goggle-linux?shallow=true&ref=hdzero";
+    hdzero-goggle-buildroot.flake = false; # this input doesn't contain a flake.nix
+    hdzero-goggle-linux-src.url = "git+https://github.com/DavHau/hdzero-goggle-linux?shallow=1&ref=hdzero";
     hdzero-goggle-linux-src.flake = false;
-    kernel-5-4-src.url = "git+https://github.com/DavHau/hdzero-goggle-linux?shallow=true&ref=tina54";
+    kernel-5-4-src.url = "git+https://github.com/DavHau/hdzero-goggle-linux?shallow=1&ref=tina54";
     kernel-5-4-src.flake = false;
-    lvgl-src.url = "git+https://github.com/lvgl/lvgl?shallow=true&ref=refs/tags/v8.3.5";
+    lvgl-src.url = "git+https://github.com/lvgl/lvgl?shallow=1&ref=refs/tags/v8.3.5";
     lvgl-src.flake = false;
-    minIni-src.url = "git+https://github.com/compuphase/minIni?shallow=true";
+    minIni-src.url = "git+https://github.com/compuphase/minIni?shallow=1";
     minIni-src.flake = false;
     # A similar board with several supported kernels.
-    tinyvision-src.url = "git+https://github.com/YuzukiHD/TinyVision?shallow=true";
+    tinyvision-src.url = "git+https://github.com/YuzukiHD/TinyVision?shallow=1";
     tinyvision-src.flake = false;
   };
-  outputs = {
-    self,
-    nixpkgs,
-    nixpkgs_unstable,
-    nixpkgs_22_05,
-    nix-filter,
-    hdzero-goggle-buildroot,
-    hdzero-goggle-linux-src,
-    kernel-5-4-src,
-    lvgl-src,
-    minIni-src,
-    tinyvision-src,
-  }: let
-    # Currently can only support x86_64-linux builders, due to the hardcoded toolchain
-    system = "x86_64-linux";
-    pkgs = nixpkgs.legacyPackages.${system};
-    lib = nixpkgs.lib;
-    pkgsArm = import nixpkgs {
+  outputs =
+    {
+      self,
+      nixpkgs,
+      nixpkgs_unstable,
+      nixpkgs_22_05,
+      nix-filter,
+      hdzero-goggle-buildroot,
+      hdzero-goggle-linux-src,
+      lvgl-src,
+      minIni-src,
+      ...
+    }:
+    let
+      # Currently can only support x86_64-linux builders, due to the hardcoded toolchain
       system = "x86_64-linux";
-      crossSystem = "armv7l-linux";
-      config.pulseaudio = false;
-      overlays = [(curr: prev: {
-        ffmpeg = curr.ffmpeg_6-headless.override {
-          withVaapi = false;
+      pkgs = nixpkgs.legacyPackages.${system};
+      lib = nixpkgs.lib;
+      pkgsArm = import nixpkgs {
+        system = "x86_64-linux";
+        crossSystem = "armv7l-linux";
+        config.pulseaudio = false;
+        overlays = [
+          (curr: prev: {
+            ffmpeg =
+              (curr.ffmpeg_6-headless.override {
+                withVaapi = false;
+              }).overrideAttrs
+                (old: {
+                  patches = lib.filter (
+                    patch: !(lib.hasInfix "binutils" "${patch}" || lib.hasInfix "nvccflags-cpp14" "${patch}")
+                  ) prev.ffmpeg_6-headless.patches;
+                });
+            mpg123 = prev.mpg123.override {
+              withPulse = false;
+              withJack = false;
+            };
+            docker-compose = prev.docker-compose.overrideAttrs (old: {
+              vendorHash = "sha256-6KLdDBuPiB/qh+3IfABu8Gvopu5ucTrNg9jh7G+cMss=";
+            });
+          })
+        ];
+      };
+      # Source code without the nix directory and flake files to improve build caching
+      hdzero-goggle-src = nix-filter.lib {
+        root = ./.;
+        include = [
+          "lib"
+          "src"
+          "CMakeLists.txt"
+          "VERSION"
+          "mkapp"
+        ];
+      };
+    in
+    {
+      # Packages that can be built via `nix build .#<name>`
+      packages.${system} = {
+
+        # make the nix built goggle app the default package
+        default = self.packages.${system}.goggle-app-nix;
+
+        # goggle app built with nix
+        goggle-app-nix = pkgsArm.callPackage ./nix/goggle-app-nix {
+          inherit
+            hdzero-goggle-src
+            nix-filter
+            minIni-src
+            lvgl-src
+            ;
         };
-        mpg123 = prev.mpg123.override {
-          withPulse = false;
-          withJack = false;
+
+        # hdzero binary kernel modules for which we do not have the source
+        kernel-modules = pkgs.callPackage ./nix/kernel-modules.nix {
+          inherit hdzero-goggle-src nix-filter;
+          inherit (self.packages.${system}) kernel;
         };
-        docker-compose = prev.docker-compose.overrideAttrs (old: {
-          vendorHash = "sha256-6KLdDBuPiB/qh+3IfABu8Gvopu5ucTrNg9jh7G+cMss=";
-        });
-      })];
-    };
-    # Source code without the nix directory and flake files to improve build caching
-    hdzero-goggle-src = nix-filter.lib {
-      root = ./.;
-      include = [ "lib" "src" "CMakeLists.txt" "VERSION" "mkapp" ];
-    };
-  in
-  {
-    # Packages that can be built via `nix build .#<name>`
-    packages.${system} = {
 
-      # make the goggle app the default package
-      default = self.packages.${system}.goggle-app;
+        # the kernel built with nix
+        kernel =
+          nixpkgs_22_05.legacyPackages.${system}.pkgsCross.armv7l-hf-multiplatform.callPackage ./nix/kernel
+            {
+              inherit hdzero-goggle-linux-src;
+              breakpointHook = pkgs.breakpointHook;
+            };
 
-      # the goggle app including the jffs2 image with service binaries
-      goggle-app = pkgs.callPackage ./nix/goggle-app.nix {
-        inherit hdzero-goggle-src;
-        inherit (self.packages.${system}) toolchain;
+        # a busybox based rootfs ported to the nix build system
+        # boots fast, but harder to extend (no nixos modules)
+        rootfs-nix = pkgs.callPackage ./nix/rootfs-nix {
+          inherit (self.packages.${system}) hdzg-os-files;
+          inherit hdzero-goggle-buildroot nix-filter;
+          kernel = self.packages.${system}.kernel;
+          goggle-app = self.packages.${system}.goggle-app-nix;
+        };
+
+        # a actual nixos based rootfs
+        # - TODO: fix slow boot time
+        # - the nixos module system can be used to extend it
+        rootfs-nixos = pkgsArm.callPackage ./nix/rootfs-nixos {
+          inherit nix-filter;
+          kernel = self.packages.${system}.kernel;
+          goggle-app = self.packages.${system}.goggle-app-nix;
+          machine = self.nixosConfigurations.hdzero;
+        };
+
+        # bootable sdcard image containing:
+        # - nix built kernel
+        # - nix built goggle app
+        # - nix built rootfs
+        sdcard-nix = pkgs.callPackage ./nix/sdcard {
+          inherit hdzero-goggle-buildroot;
+          inherit (self.packages.${system})
+            hdzero-goggle-tools
+            kernel
+            ;
+          goggle-app = self.packages.${system}.goggle-app-nix;
+          rootfs = self.packages.${system}.rootfs-nix;
+        };
+
+        # sdcard with full blown nixos system
+        sdcard-nixos = pkgs.callPackage ./nix/sdcard {
+          inherit hdzero-goggle-buildroot;
+          inherit (self.packages.${system})
+            hdzero-goggle-tools
+            kernel
+            ;
+          goggle-app = self.packages.${system}.goggle-app-nix;
+          rootfs = self.packages.${system}.rootfs-nixos;
+          init = "/init";
+        };
+
+        # useful to restore FPGA flash, if it got wiped for some reason (eg. no video)
+        sdcard-recovery = pkgs.callPackage ./nix/sdcard-recovery.nix {
+          inherit (self.packages.${system}) upstream-firmware-archive;
+        };
+
+        # used to extract files for different purposes
+        upstream-firmware-archive = pkgs.fetchzip {
+          url = "https://www.hd-zero.com/_files/archives/967e02_9e6db8079a354f86979994a4ed28ab59.zip?dn=HDZEROGOGGLE_Rev20250319.zip";
+          hash = "sha256-x/6MKHIr4tvItMR2/+B03jkaPL3fpaMrtrA0l++gJYM=";
+          stripRoot = false;
+        };
+
+        # filesystem extracted from the original HDZG_OS.bin
+        hdzg-os-files = nixpkgs_unstable.legacyPackages.x86_64-linux.callPackage ./nix/hdzg-os-files.nix {
+          inherit (self.packages.${system}) upstream-firmware-archive;
+        };
+
+        # some bash scripts which the goggle app depends on
+        hdzero-scripts = pkgs.callPackage ./nix/hdzero-scripts { };
+
+        # tools for creating a bootable image
+        hdzero-goggle-tools = pkgs.callPackage ./nix/hdzero-goggle-tools.nix { };
+
+        # tiny cli tool to query ini options via shell scripts
+        # useful to write systemd services depending on ini settings
+        ini-read = pkgsArm.callPackage ./packages/ini-read {
+          inherit minIni-src;
+        };
       };
 
-      goggle-app-nix = pkgsArm.callPackage ./nix/goggle-app-nix {
-        inherit hdzero-goggle-src nix-filter minIni-src lvgl-src;
+      # check all packages in CI-pipeline
+      checks.${system} = self.packages.${system};
+
+      # a dev environment which can be entered via `nix develop .`
+      devShells.${system}.default = pkgs.callPackage ./nix/devShell.nix {
+        # inherit (self.packages.${system}) toolchain;
       };
 
-      emulate = pkgs.callPackage ./nix/emulate {
-        rootfs = self.packages.${system}.rootfs-nixos;
-        pkgsLinux = nixpkgs_22_05.legacyPackages.${system}.pkgsCross.armv7l-hf-multiplatform;
-        inherit (self.packages.${system}) kernel;
-        # inherit hdzero-goggle-linux-src;
+      # the nixos configuration for the nixos based version of the goggle os
+      nixosConfigurations.hdzero = lib.nixosSystem {
+        specialArgs = {
+          packages = self.packages.${system};
+        };
+        modules = [
+          {
+            nixpkgs.pkgs = pkgsArm;
+            nixpkgs.system = "armv7l-linux";
+            imports = [ ./machines/hdzero/configuration.nix ];
+          }
+        ];
       };
 
-      emulate_5_4 = pkgs.callPackage ./nix/emulate_5_4 {
-        inherit pkgsArm;
-        kernel = self.packages.${system}.kernel;
-      };
-
-      kernel-modules = pkgs.callPackage ./nix/kernel-modules.nix {
-        inherit hdzero-goggle-src nix-filter;
-        inherit (self.packages.${system}) kernel;
-      };
-
-      # the kernel built with nix
-      kernel = nixpkgs_22_05.legacyPackages.${system}.pkgsCross.armv7l-hf-multiplatform.callPackage ./nix/kernel {
-        inherit hdzero-goggle-linux-src;
-        breakpointHook = pkgs.breakpointHook;
-      };
-
-      # kernel = (pkgsArm.linux_6_12.override {
-      #   defconfig = "sunxi_defconfig";
-      #   autoModules = false;
-      #   extraConfig = ''
-      #     CONFIG_SERIAL_8250 y
-      #     CONFIG_SERIAL_8250_CONSOLE y
-      #     CONFIG_SERIAL_EARLYCON y
-      #     CONFIG_EARLY_PRINTK y
-      #   '';
-      # }).overrideAttrs (old: {
-      #   installTargets = old.installTargets ++ [ "uinstall" ];
-      #   buildFlags = old.buildFlags ++ [
-      #     "uImage"
-      #     "LOADADDR=0x40008000"
-      #   ];
-      # });
-
-      # experiment with kernel 5.4
-      kernel_5_4 = nixpkgs_22_05.legacyPackages.${system}.pkgsCross.armv7l-hf-multiplatform.callPackage ./nix/kernel_5_4 {
-        inherit kernel-5-4-src;
-        breakpointHook = pkgs.breakpointHook;
-      };
-
-      # linux kernel version 4.9.191 from a similar board which is properly open sourced
-      # kernel = nixpkgs_22_05.legacyPackages.${system}.pkgsCross.armv7l-hf-multiplatform.callPackage ./nix/kernel {
-      #   inherit hdzero-goggle-linux-src;
-      #   breakpointHook = pkgs.breakpointHook;
-      # };
-
-      # only the rootfs etx2 image built by wrapping buildroot
-      rootfs = pkgs.callPackage ./nix/rootfs {
-        inherit hdzero-goggle-buildroot nix-filter;
-        inherit (self.packages.${system}) kernel toolchain;
-      };
-
-      rootfs-nix = pkgs.callPackage ./nix/rootfs-nix {
-        inherit (self.packages.${system}) hdzg-os-files;
-        inherit hdzero-goggle-buildroot nix-filter;
-        kernel = self.packages.${system}.kernel;
-        goggle-app = self.packages.${system}.goggle-app-nix;
-      };
-
-      rootfs-nixos = pkgsArm.callPackage ./nix/rootfs-nixos {
-        inherit nix-filter;
-        kernel = self.packages.${system}.kernel;
-        goggle-app = self.packages.${system}.goggle-app-nix;
-        machine = self.nixosConfigurations.hdzero;
-      };
-
-      # sdcard containing:
-      # - nix built kernel
-      # - nix built goggle app
-      # - buildroot built rootfs
-      sdcard = pkgs.callPackage ./nix/sdcard {
-        inherit hdzero-goggle-buildroot;
-        inherit (self.packages.${system})
-          goggle-app
-          hdzero-goggle-tools
-          kernel
-          rootfs
+      # different experiments non essential to the main build
+      # kept for future reference and debuggin purposes only
+      experiments.${system} = import ./nix/experiments.nix {
+        inherit
+          self
+          pkgs
+          pkgsArm
+          system
           ;
-        init = "/linuxrc";
-      };
-
-      # sdcard containing:
-      # - nix built kernel
-      # - nix built goggle app
-      # - nix built rootfs
-      sdcard-nix = self.packages.${system}.sdcard.override {
-        goggle-app = self.packages.${system}.goggle-app-nix;
-        rootfs = self.packages.${system}.rootfs-nix;
-      };
-
-      # sdcard with full blown nixos system
-      sdcard-nixos = self.packages.${system}.sdcard.override {
-        goggle-app = self.packages.${system}.goggle-app-nix;
-        rootfs = self.packages.${system}.rootfs-nixos;
-        init = "/init";
-      };
-
-      sdcard-debug = pkgs.callPackage ./nix/sdcard/debug.nix {
-        inherit hdzero-goggle-buildroot pkgsArm;
-        inherit (self.packages.${system})
-          hdzero-goggle-tools
-          kernel
-          rootfs
-          ;
-        goggle-app = self.packages.${system}.goggle-app-nix;
-        init = "/bin/sh";
-      };
-
-      sdcard-recovery = pkgs.callPackage ./nix/sdcard-recovery.nix {
-        inherit (self.packages.${system}) upstream-firmware-archive;
-      };
-
-      xradio-driver = pkgsArm.callPackage ./nix/xradio-driver {
-        inherit (self.packages.${system}) kernel;
-      };
-
-      upstream-firmware-archive = pkgs.fetchzip {
-        url = "https://www.hd-zero.com/_files/archives/967e02_9e6db8079a354f86979994a4ed28ab59.zip?dn=HDZEROGOGGLE_Rev20250319.zip";
-        hash = "sha256-x/6MKHIr4tvItMR2/+B03jkaPL3fpaMrtrA0l++gJYM=";
-        stripRoot=false;
-      };
-
-      # filesystem extracted from the original HDZG_OS.bin
-      hdzg-os-files = nixpkgs_unstable.legacyPackages.x86_64-linux.callPackage ./nix/hdzg-os-files.nix {
-        inherit (self.packges.${system}) upstream-firmware-archive;
-      };
-
-      # some bash scripts which teh goggle app depends on
-      hdzero-scripts = pkgs.callPackage ./nix/hdzero-scripts {};
-
-      # tools for creating a bootable image
-      hdzero-goggle-tools = pkgs.callPackage ./nix/hdzero-goggle-tools.nix {};
-
-      # legacy: patched upstream toolchain to make compatible with nix build sandbox
-      toolchain = pkgs.callPackage ./nix/toolchain.nix {};
-
-      # legacy: this is simply wrapping the full buildroot build from https://github.com/bkleiner/hdzero-goggle-buildroot
-      # better use .#sdcard output instead
-      # contains sdcard.img bootable image, as well as HDZ_OS.bin
-      os-images = pkgs.callPackage ./nix/os-images.nix {
-        inherit hdzero-goggle-src hdzero-goggle-buildroot hdzero-goggle-linux-src;
-        inherit (self.packages.${system}) toolchain;
-      };
-
-      # webrtc library (experiment)
-      libpeer = pkgs.callPackage ./nix/libpeer.nix {};
-
-      # tools to extract files from ext images. currently not used.
-      extfstools = pkgs.callPackage ./nix/extfstools.nix { };
-
-      ini-read = pkgsArm.callPackage ./packages/ini-read {
-        inherit minIni-src;
+        inherit (self) inputs;
       };
     };
-
-    # a dev environment which can be entered via `nix develop .`
-    devShells.${system}.default = pkgs.callPackage ./nix/devShell.nix {
-      inherit (self.packages.${system}) toolchain;
-    };
-
-    nixosConfigurations.hdzero = lib.nixosSystem {
-      specialArgs = {
-        packages = self.packages.${system};
-      };
-      modules = [{
-        nixpkgs.pkgs = pkgsArm;
-        nixpkgs.system = "armv7l-linux";
-        imports = [./machines/hdzero/configuration.nix];
-      }];
-    };
-  };
 }
