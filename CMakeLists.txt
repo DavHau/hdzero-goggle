@@ -53,8 +53,8 @@ set(STANDARD_LIBRARIES
 )
 
 add_definitions(
-	-DAWCHIP=AW_V5 
-	-D_GNU_SOURCE 
+	-DAWCHIP=AW_V5
+	-D_GNU_SOURCE
 	-DUSE_LOG_LIB_GLOG
 )
 
@@ -69,13 +69,13 @@ add_subdirectory(lib/lvgl)
 add_subdirectory(lib/minIni)
 add_subdirectory(lib/log)
 add_subdirectory(lib/esp-loader)
-add_subdirectory(lib/softwinner)
+# add_subdirectory(lib/softwinner)
 
 if(EMULATOR_BUILD)
 	find_package(SDL2 REQUIRED)
 else()
-	add_subdirectory(lib/ffmpeg)
-	add_subdirectory(lib/live)
+	# add_subdirectory(lib/ffmpeg)
+	# add_subdirectory(lib/live)
 endif()
 
 # main application
@@ -116,7 +116,7 @@ endif()
 
 add_executable(${PROJECT_NAME} ${SRC_FILES})
 
-target_include_directories(${PROJECT_NAME} PRIVATE 
+target_include_directories(${PROJECT_NAME} PRIVATE
 	src/
 	src/core
 	src/driver
@@ -134,7 +134,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 	lvgl
 	minIni
 	esp-loader
-	softwinner
+	# softwinner
 )
 
 if(EMULATOR_BUILD)
@@ -148,7 +148,7 @@ if(NOT EMULATOR_BUILD)
 	add_executable(record
 		${SRC_FILES_RECORD}
 	)
-	target_include_directories(record PRIVATE 
+	target_include_directories(record PRIVATE
 		src/record
 
 		lib/linux/include
@@ -159,9 +159,9 @@ if(NOT EMULATOR_BUILD)
 		${STANDARD_LIBRARIES}
 
 		log
-		ffmpeg
+		# ffmpeg
 		minIni
-		softwinner
+		# softwinner
 	)
 
 	# rtspLive application
@@ -176,7 +176,7 @@ if(NOT EMULATOR_BUILD)
 		${SRC_FILES_RTSPLIVE_STREAM}
 		${SRC_FILES_RTSPLIVE_SERVER}
 	)
-	target_include_directories(rtspLive PRIVATE 
+	target_include_directories(rtspLive PRIVATE
 		src/rtspLive
 		src/rtspLive/stream
 		src/rtspLive/server
@@ -189,7 +189,7 @@ if(NOT EMULATOR_BUILD)
 		${STANDARD_LIBRARIES}
 
 		log
-		live
+		# live
 		minIni
 	)
 

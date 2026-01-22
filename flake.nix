@@ -71,6 +71,7 @@
       hdzero-goggle-src = nix-filter.lib {
         root = ./.;
         include = [
+          "conf"
           "lib"
           "src"
           "CMakeLists.txt"

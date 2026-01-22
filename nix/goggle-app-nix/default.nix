@@ -13,6 +13,7 @@
   alsa-lib,
   vim,
   ripgrep,
+  rsync,
   libxcrypt,
   which,
   live555,
@@ -109,7 +110,7 @@ let
     nativeBuildInputs = [
       autoPatchelfHook
     ];
-    installPhase = lib.replaceStrings ["--replace-fail"] ["--replace"] ''
+    installPhase = lib.replaceStrings [ "--replace-fail" ] [ "--replace" ] ''
       mkdir -p $out/lib
       cp -r lib/softwinner/lib/* $out/lib/
       mkdir -p $out/include
@@ -128,6 +129,7 @@ stdenv.mkDerivation {
   src = nix-filter.lib {
     root = hdzero-goggle-src;
     include = [
+      "conf"
       "mkapp"
       "src"
       "CMakeLists.txt"
@@ -139,7 +141,7 @@ stdenv.mkDerivation {
       "lib/minIni/CMakeLists.txt"
     ];
   };
-  passthru = {inherit softwinnerLibs;};
+  passthru = { inherit softwinnerLibs; };
   nativeBuildInputs = [
     cmake
     mtdutils
@@ -147,6 +149,7 @@ stdenv.mkDerivation {
     autoPatchelfHook
     vim
     ripgrep
+    rsync
     which
   ];
   buildInputs = [
@@ -171,16 +174,16 @@ stdenv.mkDerivation {
   ];
   cmakeFlags = [
     "-DCMAKE_BUILD_TYPE=Release"
+    "-DHDZ_GOGGLE=ON"
   ];
   # libc.so raises issues during runtime, therefore link against libc.so.6
   patchelfFlags = [
     "--replace-needed libc.so libc.so.6"
   ];
-  postPatch = lib.replaceStrings ["--replace-fail"] ["--replace"] ''
+  postPatch = lib.replaceStrings [ "--replace-fail" ] [ "--replace" ] ''
     substituteInPlace ./mkapp/mkapp_ota.sh \
       --replace-fail "APP_VERSION=\$(get_app_version)" "APP_VERSION=${version}"
     patchShebangs ./mkapp/mkapp_ota.sh
-    cp ${./CMakeLists-nix.txt} ./CMakeLists.txt
 
     # Disable the services installation hack that upstream uses
     # (it breaks the sd card on first boot)
