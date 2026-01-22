@@ -54,20 +54,96 @@ static uint16_t elrs_osd_overlay[HD_VMAX][HD_HMAX];
 void msp_process_packet();
 static void handle_osd(uint8_t *payload, uint8_t size);
 
-static const uint16_t freq_table[] = {
-    5658, 5695, 5732, 5769, 5806, 5843, 5880, 5917, // R1-8
-    5705,                                           // E1
-    5740, 5760, 5800                                // F1/2/4
+static const uint16_t freq_table[ANALOG_CHANNEL_NUM] = {
+    5865, 5845, 5825, 5805, 5785, 5765, 5745, 5725, // A
+    5733, 5752, 5771, 5790, 5809, 5828, 5847, 5866, // B
+    5705, 5685, 5665, 5645, 5885, 5905, 5925, 5945, // E
+    5740, 5760, 5780, 5800, 5820, 5840, 5860, 5880, // F
+    5658, 5695, 5732, 5769, 5806, 5843, 5880, 5917, // R
+    5362, 5399, 5436, 5473, 5510, 5547, 5584, 5621  // L
 };
 
-static const uint8_t channel_map[] = {
+// Note: F8 and R7 are both same frequency (5880 MHz), so they are both mapped to 7.
+static const uint8_t hdzero_channel_map[ANALOG_CHANNEL_NUM] = {
     0, 0, 0, 0, 0, 0, 0, 0,    // A
     0, 0, 0, 0, 0, 0, 0, 0,    // B
     9, 0, 0, 0, 0, 0, 0, 0,    // E
-    10, 11, 0, 12, 0, 0, 0, 0, // F
+    10, 11, 0, 12, 0, 0, 0, 7, // F
     1, 2, 3, 4, 5, 6, 7, 8,    // R
     0, 0, 0, 0, 0, 0, 0, 0,    // L
 };
+
+static int get_freq_index(uint16_t const freq) {
+    for (size_t i = 0; i < ANALOG_CHANNEL_NUM; i++) {
+        if (freq_table[i] == freq) {
+            return i;
+        }
+    }
+    return -1; // Not found
+}
+
+static uint8_t hdz_ch2index(uint8_t is_lowband, uint8_t ch) {
+    uint8_t chan;
+    if (is_lowband == SETTING_SOURCES_HDZERO_BAND_RACEBAND) {
+        if (ch <= 8) {
+            chan = ch - 1 + (4 * 8); // Map R1..8
+        } else if (ch == 9) {
+            chan = 2 * 8; // Map E1
+        } else if (ch == 10) {
+            chan = 3 * 8; // Map F1
+        } else if (ch == 11) {
+            chan = 3 * 8 + 1; // Map F2
+        } else if (ch == 12) {
+            chan = 3 * 8 + 3; // Map F4
+        }
+    } else {
+        chan = ch - 1 + 5 * 8; // Map L1..8
+    }
+    return chan;
+}
+
+static uint8_t hdz_index2ch(uint8_t index) {
+    uint8_t chan;
+
+    if (index < 48)
+        chan = hdzero_channel_map[index];
+    else
+        chan = 0;
+
+    return chan;
+}
+
+static void channel_channel_hdzero(uint8_t const channel) {
+    if (channel == 0 || channel > HDZERO_CHANNEL_NUM) {
+        LOGE("Invalid HDZero channel %d", channel);
+        return;
+    }
+    if ((g_setting.scan.channel & 0xF) != channel || g_app_state != APP_STATE_VIDEO) {
+        g_setting.scan.channel = channel;
+        beep();
+        pthread_mutex_lock(&lvgl_mutex);
+        dvr_cmd(DVR_STOP);
+        app_switch_to_hdzero(true);
+        app_state_push(APP_STATE_VIDEO);
+        pthread_mutex_unlock(&lvgl_mutex);
+    }
+}
+
+static void change_channel_analog(uint8_t const channel) {
+    if (channel == 0 || channel > ANALOG_CHANNEL_NUM) {
+        LOGE("Invalid analog channel %d", channel);
+        return;
+    }
+    if (g_setting.source.analog_channel != channel || g_app_state != APP_STATE_VIDEO) {
+        g_setting.source.analog_channel = channel;
+        beep();
+        pthread_mutex_lock(&lvgl_mutex);
+        dvr_cmd(DVR_STOP);
+        app_switch_to_analog(0);
+        app_state_push(APP_STATE_VIDEO);
+        pthread_mutex_unlock(&lvgl_mutex);
+    }
+}
 
 void elrs_init() {
     sem_init(&response_semaphore, 0, 0);
@@ -212,65 +288,56 @@ void msp_process_packet() {
     if (packet.type == MSP_PACKET_COMMAND) {
         switch (packet.function) {
         case MSP_GET_BAND_CHAN: {
-            uint8_t chan, ch, band;
-            ch = g_setting.scan.channel;
-            band = g_setting.source.hdzero_band;
-
-            if (band == SETTING_SOURCES_HDZERO_BAND_RACEBAND) {
-                if (ch <= 8) {
-                    chan = ch - 1 + (4 * 8); // Map R1..8
-                } else if (ch == 9) {
-                    chan = 2 * 8; // Map E1
-                } else if (ch == 10) {
-                    chan = 3 * 8; // Map F1
-                } else if (ch == 11) {
-                    chan = 3 * 8 + 1; // Map F2
-                } else if (ch == 12) {
-                    chan = 3 * 8 + 3; // Map F4
-                }
-            } else {
-                chan = ch - 1 + 5 * 8; // Map L1..8
+            uint8_t chan = 0;
+            if (g_source_info.source == SOURCE_HDZERO) {
+                chan = hdz_ch2index(g_setting.source.hdzero_band, g_setting.scan.channel);
+            } else if (g_source_info.source == SOURCE_AV_MODULE) {
+                chan = g_setting.scan.channel - 1;
             }
             msp_send_packet(MSP_GET_BAND_CHAN, MSP_PACKET_RESPONSE, 1, &chan);
         } break;
         case MSP_SET_BAND_CHAN: {
-            uint8_t ch, chan = packet.payload[0];
-            if (g_source_info.source == SOURCE_HDZERO) { // HDZero mode
-                chan = chan < 48 ? channel_map[chan] : 0;
-                ch = g_setting.scan.channel & 0xF;
-                if (chan != 0 && (chan != ch || g_app_state != APP_STATE_VIDEO)) {
-                    g_setting.scan.channel = chan;
-                    beep();
-                    pthread_mutex_lock(&lvgl_mutex);
-                    dvr_cmd(DVR_STOP);
-                    app_switch_to_hdzero(true);
-                    app_state_push(APP_STATE_VIDEO);
-                    pthread_mutex_unlock(&lvgl_mutex);
+            uint8_t const chan = packet.payload[0];
+            if (g_source_info.source == SOURCE_HDZERO) {
+                channel_channel_hdzero(hdz_index2ch(chan));
+            } else {
+#if defined(HDZBOXPRO) || defined(HDZGOGGLE2)
+                if (g_source_info.source == SOURCE_AV_MODULE) {
+                    change_channel_analog(chan + 1);
                 }
+#endif
             }
         } break;
         case MSP_GET_FREQ: {
-            uint8_t ch = g_setting.scan.channel & 0xF;
-            uint16_t freq = freq_table[ch - 1];
-            uint8_t buf[2] = {freq & 0xFF, freq >> 8};
+            uint8_t ch = 0;
+            uint16_t freq;
+            uint8_t buf[2];
+            if (g_source_info.source == SOURCE_HDZERO) {
+                ch = hdz_ch2index(g_setting.source.hdzero_band, g_setting.scan.channel) + 1;
+            } else if (g_source_info.source == SOURCE_AV_MODULE) {
+                ch = g_setting.scan.channel;
+            }
+            freq = ch == 0 ? 0 : freq_table[ch - 1];
+            buf[0] = freq & 0xff;
+            buf[1] = freq >> 8;
             msp_send_packet(MSP_GET_FREQ, MSP_PACKET_RESPONSE, sizeof(buf), buf);
         } break;
         case MSP_SET_FREQ: {
-            uint16_t freq = packet.payload[0] | (uint16_t)packet.payload[1] << 8;
-            uint8_t ch = g_setting.scan.channel & 0xF;
-            if (g_source_info.source == SOURCE_HDZERO) { // HDZero mode
-                for (int i = 0; i < BASE_CH_NUM; i++) {
-                    int chan = i + 1;
-                    if (freq == freq_table[i] && (ch != chan || g_app_state != APP_STATE_VIDEO) && chan > 0 && chan < (BASE_CH_NUM + 1)) {
-                        g_setting.scan.channel = chan;
-                        beep();
-                        pthread_mutex_lock(&lvgl_mutex);
-                        app_switch_to_hdzero(true);
-                        app_state_push(APP_STATE_VIDEO);
-                        pthread_mutex_unlock(&lvgl_mutex);
-                        break;
-                    }
+            uint16_t const freq = packet.payload[0] | (uint16_t)packet.payload[1] << 8;
+            int const freq_index = get_freq_index(freq);
+            if (freq_index < 0) {
+                LOGE("Invalid frequency %d", freq);
+                break;
+            }
+            if (g_source_info.source == SOURCE_HDZERO) {
+                uint8_t const new_ch = hdzero_channel_map[freq_index];
+                if (new_ch == 0) {
+                    LOGE("Invalid HDZero channel for frequency %d", freq);
+                    break;
                 }
+                channel_channel_hdzero(new_ch);
+            } else if (g_source_info.source == SOURCE_AV_MODULE) {
+                change_channel_analog(freq_index + 1);
             }
         } break;
         case MSP_GET_REC_STATE: {
@@ -418,7 +485,7 @@ void msp_channel_update() {
     uint8_t const band = g_setting.source.hdzero_band;
     uint8_t chan;
 
-    if (ch == 0 || ch > CHANNEL_NUM)
+    if (ch == 0 || ch > HDZERO_CHANNEL_NUM)
         return; // Invalid value -> ignore
     if (band == SETTING_SOURCES_HDZERO_BAND_RACEBAND) {
         if (ch <= 8) {

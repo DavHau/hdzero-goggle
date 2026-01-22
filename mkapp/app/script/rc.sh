@@ -1,5 +1,7 @@
 #!/bin/sh
 
+PLATFORM="$(cat /mnt/app/platform)"
+
 function insmod_all()
 {
 	insmod /mnt/app/ko/gpio_keys_hdzero.ko
@@ -19,7 +21,14 @@ function config_uart_vdpo()
 	insmod_all
 
 	dispw -x
-	dispw -s vdpo 1080p50
+
+	if [ $PLATFORM == "HDZGOGGLE" ]; then
+		dispw -s vdpo 1080p50
+	elif [ $PLATFORM == "HDZGOGGLE2" ]; then
+		dispw -s vdpo 1080p50
+	elif [ $PLATFORM == "HDZBOXPRO" ]; then
+		dispw -s vdpo 720p60
+	fi
 }
 
 function write_flashes()
@@ -27,19 +36,26 @@ function write_flashes()
 	/mnt/app/script/write_flashes.sh
 }
 
-
 function beep()
 {
-        echo "131">/sys/class/gpio/export
-        echo "1">/sys/class/gpio/gpio131/value
-        sleep 1
-        echo "0">/sys/class/gpio/gpio131/value
+	echo "131">/sys/class/gpio/export
+	echo "1">/sys/class/gpio/gpio131/value
+	sleep 1
+	echo "0">/sys/class/gpio/gpio131/value
 }
 
 function update_boot()
 {
-	local boot_file=/mnt/extsd/HDZG_BOOT.bin
-	local os_file=/mnt/extsd/HDZG_OS.bin
+	if [ $PLATFORM == "HDZGOGGLE" ]; then
+        local boot_file=/mnt/extsd/HDZG_BOOT.bin
+        local os_file=/mnt/extsd/HDZG_OS.bin
+    elif [ $PLATFORM == "HDZGOGGLE2" ]; then
+        local boot_file=/mnt/extsd/HDZG_BOOT.bin
+        local os_file=/mnt/extsd/HDZG_OS.bin
+	elif [ $PLATFORM == "HDZBOXPRO" ]; then
+        local boot_file=/mnt/extsd/HDZB_BOOT.bin
+        local os_file=/mnt/extsd/HDZB_OS.bin
+	fi
 
 	if [ -e $boot_file ]; then
 		export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/mnt/app
@@ -82,12 +98,15 @@ if [ -e /mnt/extsd/RECORD.log ]; then
 else
 	/mnt/app/app/record/record &
 fi
-#/mnt/app/app/record/gogglecmd -rec startao
-/mnt/app/script/sdstat_log_backup.sh
-#/mnt/app/app/record/sdstat &
 
-#system led
-/mnt/app/script/system_daemon.sh &
+/mnt/app/script/sdstat_log_backup.sh
+
+	#system led
+if [ $PLATFORM == "HDZGOGGLE" ]; then
+	/mnt/app/script/system_daemon.sh &
+elif [ $PLATFORM == "HDZGOGGLE2" ]; then
+	/mnt/app/script/system_daemon.sh &
+fi
 
 #external services
 if [ ! -z $(ls -1 /mnt/extsd/hdzgoggle-services-* 2> /dev/null) ]; then
@@ -111,7 +130,6 @@ else
 	if [ -e /mnt/extsd/HDZGOGGLE.log ]; then
 		/mnt/app/app/HDZGOGGLE > /mnt/extsd/HDZGOGGLE.log 2>&1 &
 	else
-		#GLOG_minloglevel=3 /mnt/app/app/HDZGOGGLE &  > /dev/null 2>&1
 		/mnt/app/app/HDZGOGGLE &
 	fi
 fi

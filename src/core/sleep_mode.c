@@ -4,14 +4,12 @@
 #include "core/common.hh"
 #include "core/dvr.h"
 #include "core/settings.h"
-
 #include "driver/beep.h"
 #include "driver/dm5680.h"
 #include "driver/fans.h"
 #include "driver/hardware.h"
-
+#include "driver/rtc6715.h"
 #include "log/log.h"
-
 #include "ui/page_fans.h"
 
 static app_state_t previousState;
@@ -29,18 +27,22 @@ void go_sleep() {
 
     // Stop DVR
     dvr_cmd(DVR_STOP);
+#if defined(HDZGOGGLE) || defined(HDZGOGGLE2)
     dvr_update_vi_conf(VR_1080P30);
+#elif defined(HDZBOXPRO)
+    dvr_update_vi_conf(VR_720P60);
+#endif
 
-    // Turn off OLED
-    OLED_ON(0);
+    hw_screen_on(0);
 
     // Turn off HDZero Receiver
     HDZero_Close();
 
-    // Turn off Analog Receiver  -- Batch 2 goggles only
-    if (getHwRevision() >= HW_REV_2) {
-        DM5680_Power_AnalogModule(1);
+    // Turn off Analog Receiver
+    if (getHwRevision() == HW_REV_2) {
+        DM5680_ExternalAnalog_Power(1);
     }
+    rtc6715.init(0, 0);
 
     // Minimum fan
     fans_auto_mode_save = g_setting.fans.auto_mode;
@@ -61,30 +63,29 @@ void go_sleep() {
 void wake_up() {
     LOGI("Exiting sleep mode");
     isSleeping = false;
+    hw_screen_on(1); // Turn on display
 
-    OLED_ON(1); // Turn on OLED
     Analog_Module_Power(1);
+    g_setting.fans.right_speed = fan_speed_save.right;
+    g_setting.fans.left_speed = fan_speed_save.left;
+    fans_right_setspeed(fan_speed_save.right);
+    fans_left_setspeed(fan_speed_save.left);
 
     g_setting.fans.top_speed = fan_speed_save.top;
-    g_setting.fans.left_speed = fan_speed_save.left;
-    g_setting.fans.right_speed = fan_speed_save.right;
     g_setting.fans.auto_mode = fans_auto_mode_save;
     fans_top_setspeed(fan_speed_save.top);
-    fans_left_setspeed(fan_speed_save.left);
-    fans_right_setspeed(fan_speed_save.right);
 
     app_state_push(previousState);
     if (previousState == APP_STATE_SUBMENU) {
         submenu_exit();
     } else if (previousState == APP_STATE_VIDEO) {
-        app_switch_to_menu(); // Necessary to display the progress bar
+        app_switch_to_menu();          // Necessary to display the progress bar
         app_state_push(previousState); // Because app_switch_to_menu() pushes main menu state
         app_exit_menu();
     }
 }
 
-void sleep_reminder()
-{
+void sleep_reminder() {
     if (isSleeping == false) {
         return;
     }

@@ -16,6 +16,7 @@ typedef struct {
 
 typedef struct {
     int channel;
+    int analog_channel;
 } setting_scan_t;
 
 typedef enum {
@@ -27,7 +28,7 @@ typedef enum {
 typedef enum {
     SETTING_AUTOSCAN_SOURCE_LAST = 0,
     SETTING_AUTOSCAN_SOURCE_HDZERO = 1,
-    SETTING_AUTOSCAN_SOURCE_EXPANSION = 2,
+    SETTING_AUTOSCAN_SOURCE_AV_MODULE = 2,
     SETTING_AUTOSCAN_SOURCE_AV_IN = 3,
     SETTING_AUTOSCAN_SOURCE_HDMI_IN = 4
 } setting_autoscan_source_t;
@@ -234,6 +235,11 @@ typedef struct {
 } ease_use_t;
 
 typedef enum {
+    SETTING_SOURCES_ANALOG_MODULE_INTERNAL = 0,
+    SETTING_SOURCES_ANALOG_MODULE_EXTERNAL = 1
+} setting_sources_analog_module_t;
+
+typedef enum {
     SETTING_SOURCES_ANALOG_FORMAT_NTSC = 0,
     SETTING_SOURCES_ANALOG_FORMAT_PAL = 1
 } setting_sources_analog_format_t;
@@ -252,10 +258,12 @@ typedef enum {
 } setting_sources_hdzero_bw_t;
 
 typedef struct {
+    setting_sources_analog_module_t analog_module;
     setting_sources_analog_format_t analog_format; // 0=NTSC, 1= PAL
     setting_sources_analog_ratio_t analog_ratio;   // 0=4:3, 1=16:9
     setting_sources_hdzero_band_t hdzero_band;
     setting_sources_hdzero_bw_t hdzero_bw;
+    uint8_t analog_channel;
 } setting_sources_t;
 
 typedef struct {
@@ -277,6 +285,11 @@ typedef struct {
 } language_t;
 
 typedef struct {
+    uint16_t calib_min;
+    uint16_t calib_max;
+} setting_analog_rssi_t;
+
+typedef struct {
     setting_scan_t scan;
     setting_fan_t fans;
     setting_autoscan_t autoscan;
@@ -293,6 +306,8 @@ typedef struct {
     ease_use_t ease;
     setting_storage_t storage;
     language_t language;
+    setting_analog_rssi_t analog_rssi;
+    bool has_all_features;
 } setting_t;
 
 extern setting_t g_setting;

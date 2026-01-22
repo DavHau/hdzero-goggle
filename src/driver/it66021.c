@@ -12,7 +12,7 @@
 #include "dm5680.h"
 #include "hardware.h"
 #include "i2c.h"
-#include "oled.h"
+#include "screen.h"
 
 #define ADDR_IT66021_RING 0x70
 
@@ -340,9 +340,10 @@ void IT66021_edid() {
     I2C_L_Write(0x49, 0xc0, 0x04);
 }
 
-void IT66021_Set_Pclk(int inv) {
+void IT66021_Set_Pclk(int inv, int dly) {
+    IT66021_Mask_WR(0, 0x0f, 0x03, 0x00);
     if (inv)
-        I2C_L_Write(ADDR_IT66021, 0x50, 0xA2);
+        I2C_L_Write(ADDR_IT66021, 0x50, 0xA0 + dly);
     else
-        I2C_L_Write(ADDR_IT66021, 0x50, 0xB2);
+        I2C_L_Write(ADDR_IT66021, 0x50, 0xB0 + dly);
 }

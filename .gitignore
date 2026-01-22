@@ -1,5 +1,8 @@
 /build
 /build_emu
+build_goggle
+build_boxpro
+build_goggle2
 linux-4.9
 /media
 toolchain
@@ -15,6 +18,7 @@ media.tar.gz
 /.vscode/settings.json
 .DS_Store
 utilities/font/out
+*.bz2
 
 # nix related
 result

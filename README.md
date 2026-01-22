@@ -13,9 +13,9 @@ The following software components have never been publicly released by hdzero:
 
 In order to make this project work, as of now, the above components are either replaced by open source alternatives from similar projects or by re-using binaries extracted from the original firmware. This is far from optimal. Many things can hardly be improved without access to the original source code.
 
-A lot of foundational work was taken from these projects:
-- [bkleiner/hdzero-goggle-buildroot](https://github.com/bkleiner/hdzero-goggle-buildroot)
-- [bkleiner/hdzero-goggle-linux](https://github.com/bkleiner/hdzero-goggle-linux)
+This repository supports the [vscode devcontainer](https://code.visualstudio.com/docs/devcontainers/containers) integration.
+To get started, install docker, vscode and the devcontainer extension.
+A [prompt](https://code.visualstudio.com/docs/devcontainers/create-dev-container#_add-configuration-files-to-a-repository) to reopen this repository in a container should appear.
 
 Currently Not Working:
 - wifi
@@ -50,7 +50,7 @@ The image can be found under `./result/sd-card.img`
 
 ### Build firmware app only
 
-When developing on the firmware app, reflashing the whole sdacrd image each time would be tedious.
+When developing on the firmware app, re-flashing the whole sd-card image each time would be tedious.
 Use this command to build only the firmware app:
 
 ```shellSession

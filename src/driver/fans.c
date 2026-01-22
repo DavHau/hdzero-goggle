@@ -13,9 +13,17 @@
 fan_speed_t fan_speed;
 
 uint8_t get_topfan_value(uint8_t level) {
+#if defined HDZGOGGLE
     uint8_t topfan_tbl[6] = {0, 17, 33, 41, 62, 100};
-    if (level > 5)
+#elif defined HDZBOXPRO
+    uint8_t topfan_tbl[6] = {0, 24, 33, 41, 62, 100};
+#elif defined HDZGOGGLE2
+    uint8_t topfan_tbl[6] = {0, 17, 33, 41, 62, 100};
+#endif
+
+    if (level > 5) {
         level = 5;
+    }
     fan_speed.top = level;
     return topfan_tbl[level];
 }
@@ -27,13 +35,17 @@ void fans_top_setspeed(uint8_t speed) {
 }
 
 void fans_left_setspeed(uint8_t speed) {
-    fan_speed.left = speed;
-    DM5680_SetFanSpeed(1, speed);
-    LOGI("fans_left_setspeed: %d", speed);
+#if defined(HDZGOGGLE) || defined(HDZGOGGLE2)
+        fan_speed.left = speed;
+        DM5680_SetFanSpeed(1, speed);
+        LOGI("fans_left_setspeed: %d", speed);
+#endif
 }
 
 void fans_right_setspeed(uint8_t speed) {
-    fan_speed.right = speed;
-    DM5680_SetFanSpeed(0, speed);
-    LOGI("fans_right_setspeed: %d", speed);
+#if defined(HDZGOGGLE) || defined(HDZGOGGLE2)
+        fan_speed.right = speed;
+        DM5680_SetFanSpeed(0, speed);
+        LOGI("fans_right_setspeed: %d", speed);
+#endif
 }

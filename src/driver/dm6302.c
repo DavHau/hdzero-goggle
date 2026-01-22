@@ -17,42 +17,6 @@
 
 #define WAIT(ms) usleep((ms) * 1000)
 
-// DM6302: RF receiver
-/*  �����ź�:
-        V536  --uart-->  DM5680  --(resetb)gpio-->  DM6302
-        V536  --m_i2c-->  ��FPGA  --rf_spi-->  DM6302
-
-    SPI:
-        page: 3bit, addr: 12bit, data: 32bit
-
-    ��FPGA reg��
-        reg_90(self-clear):
-                0x01 = Write cmd to Right DM6302
-                0x02 = Write cmd to Left DM6302
-                0x03 = Write cmd to Both DM6302
-                0x10 = Read cmd to Both DM6302
-
-        reg_91: addr[7:0]
-        reg_92: {page[2:0],addr[11:8]}
-
-        reg_93: data[7:0]
-        reg_94: data[15:8]
-        reg_95: data[23:16]
-        reg_96: data[31:24]
-
-        reg_98: read_data_right[7:0]    (read only)
-        reg_99: read_data_right[15:8]   (read only)
-        reg_9a: read_data_right[23:16]  (read only)
-        reg_9b: read_data_right[31:24]  (read only)
-
-        reg_9c: read_data_left[7:0]     (read only)
-        reg_9d: read_data_left[15:8]    (read only)
-        reg_9e: read_data_left[23:16]   (read only)
-        reg_9f: read_data_left[31:24]   (read only)
-*/
-// RF_SPI������
-/* dat0: ���Ҳ�DM6302����������
-   dat1: ���Ҳ�DM6302����������*/
 void SPI_Read(uint8_t page, uint16_t addr, uint32_t *dat0, uint32_t *dat1) {
     uint8_t val;
     uint32_t rdat;
@@ -90,10 +54,6 @@ void SPI_Read(uint8_t page, uint16_t addr, uint32_t *dat0, uint32_t *dat1) {
 #endif
 }
 
-// RF_SPIд����
-/* sel: 0=д����DM6302
-        1=д�Ҳ�DM6302
-        2=д���DM6302*/
 void SPI_Write(uint8_t sel, uint8_t page, uint16_t addr, uint32_t dat) {
     uint8_t val;
     uint32_t r1 = 0, r0 = 0;
@@ -135,7 +95,6 @@ void SPI_Write(uint8_t sel, uint8_t page, uint16_t addr, uint32_t dat) {
 #endif
 }
 
-// ����Ƶ��
 uint32_t tab[3][20] = {
     // 0x120
     {
@@ -1705,12 +1664,17 @@ void DM6302_DCOC(uint8_t SEL6302) {
     SPI_Write(SEL6302, 0x3, 0x4D4, 0x066727CC); // 0x066427CC
 }
 
-// DM6302��ʼ��
+// DM6302 init
 int DM6302_init(uint8_t freq, uint8_t bw) {
     int to_cnt = 0;
     uint32_t r0 = 1, r1 = 1;
-
+#if defined HDZGOGGLE
     system_exec("aww 0x05002814 0x00000008"); // set i2c speed to 1MHz
+#elif defined HDZBOXPRO
+    system_exec("aww 0x05002814 0x00000018"); // set i2c speed to 500KHz
+#elif defined HDZGOGGLE2
+    system_exec("aww 0x05002814 0x00000008"); // set i2c speed to 1MHz
+#endif
 
     while (r0) {
         DM5680_ResetRF(0);
@@ -1802,8 +1766,7 @@ int DM6302_init(uint8_t freq, uint8_t bw) {
     return 0;
 }
 
-// DM6302 Gain table
-// ����ֵ��Χ: 0~60
+// DM6302 Gain table: 0~60
 uint8_t DM6302_gain_tab(uint32_t d) {
     uint8_t i = 0;
     uint16_t tab[61] = {
@@ -1824,7 +1787,6 @@ uint8_t DM6302_gain_tab(uint32_t d) {
     return i;
 }
 
-// ��ȡDM6302��������ȼ�(0~60)
 void DM6302_get_gain(uint8_t *gain) {
     uint32_t r0, r1;
 
@@ -1839,9 +1801,7 @@ void DM6302_get_gain(uint8_t *gain) {
     gain[3] = DM6302_gain_tab(r1); // 0~60
 }
 
-// ������DM6302��MCU
-// open: 0=����1=��
-// ע�⣺�����κ�SPI_Read����ʱ��DM6302��MCU���봦�ڹ���״̬��
+// set dm6302 m0
 void DM6302_openM0(uint32_t open) {
     SPI_Write(0, 0x6, 0x7FC, open);
 }

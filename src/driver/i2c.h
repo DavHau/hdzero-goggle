@@ -39,9 +39,16 @@ int8_t i2c_write_n(int port, uint8_t slave_address, uint8_t addr, uint8_t *val, 
 #define ADDR_BMI270  0x68
 #define ADDR_NCT75   0x48
 
-#define ADDR_FPGA   0x64
-#define ADDR_AL     0x65
+#define ADDR_FPGA 0x64
+#define ADDR_AL   0x65
+
+#if defined HDZGOGGLE
 #define ADDR_TP2825 0x44
+#elif defined HDZBOXPRO
+#define ADDR_TP2825 0x45
+#elif defined HDZGOGGLE2
+#define ADDR_TP2825 0x44
+#endif
 
 #define ADDR_IT66021 0x49
 

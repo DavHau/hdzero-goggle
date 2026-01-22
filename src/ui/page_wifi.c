@@ -11,10 +11,11 @@
 #include <log/log.h>
 #include <minIni.h>
 
+#include "../conf/ui.h"
+
 #include "core/app_state.h"
 #include "core/common.hh"
 #include "core/dvr.h"
-#include "core/settings.h"
 #include "lang/language.h"
 #include "ui/page_common.h"
 #include "ui/ui_attribute.h"
@@ -117,18 +118,32 @@ static char INVALID_FORMAT_STR[64];
 /**
  *  Globals
  */
-static lv_coord_t col_dsc[] = {160, 160, 160, 180, 160, 160, LV_GRID_TEMPLATE_LAST};
-static lv_coord_t row_dsc[] = {60, 60, 60, 60, 60, 60, 60, 60, 40, LV_GRID_TEMPLATE_LAST};
+static lv_coord_t col_dsc[] = {UI_WIFI_COLS};
+static lv_coord_t row_dsc[] = {UI_WIFI_ROWS};
 static page_options_t page_wifi = {0};
 static lv_timer_t *page_wifi_apply_settings_timer = NULL;
 static lv_timer_t *page_wifi_apply_settings_pending_timer = NULL;
-static bool page_wifi_pending = true;
+static bool page_wifi_bootup_pending = true;
 
 /**
  * Refresh WiFi service configuration parameters.
  */
 static void page_wifi_update_services() {
     FILE *fp = NULL;
+
+    if (!page_wifi_bootup_pending) {
+        /**
+         *  Host <-> Client switching
+         *  must wipe previous settings.
+         */
+        unlink(WIFI_AP_ON);
+        unlink(WIFI_STA_ON);
+        unlink(WIFI_AP_CFG);
+        unlink(WIFI_DHCP_CFG);
+        unlink(WIFI_STA_CFG);
+        unlink(WIFI_DNS_CFG);
+        unlink(ROOT_PW_SET);
+    }
 
     if ((fp = fopen(WIFI_AP_ON, "w"))) {
         fprintf(fp, "#!/bin/sh\n");
@@ -139,7 +154,7 @@ static void page_wifi_update_services() {
         fprintf(fp, "hostapd /tmp/hostapd.conf&\n");
         fprintf(fp, "udhcpd /tmp/udhcpd.conf&\n");
         fprintf(fp, "route add default gw %s\n", g_setting.wifi.gateway);
-        fprintf(fp, "/mnt/app/app/record/rtspLive&\n");
+        fprintf(fp, "/mnt/app/app/record/rtspLive > /tmp/rtspLive.log 2>&1 &\n");
         fclose(fp);
         system_exec("chmod +x " WIFI_AP_ON);
     }
@@ -167,18 +182,20 @@ static void page_wifi_update_services() {
             fprintf(fp, "route add default gw %s\n", g_setting.wifi.gateway);
         }
 
-        fprintf(fp, "/mnt/app/app/record/rtspLive&\n");
+        fprintf(fp, "/mnt/app/app/record/rtspLive > /tmp/rtspLive.log 2>&1 &\n");
 
         fclose(fp);
         system_exec("chmod +x " WIFI_STA_ON);
     }
 
-    if ((fp = fopen("/tmp/hostapd.conf", "w"))) {
+    if ((fp = fopen(WIFI_AP_CFG, "w"))) {
         fprintf(fp, "interface=wlan0\n");
         fprintf(fp, "driver=nl80211\n");
         fprintf(fp, "ssid=%s\n", g_setting.wifi.ssid[WIFI_MODE_AP]);
         fprintf(fp, "channel=%d\n", g_setting.wifi.rf_channel);
         fprintf(fp, "hw_mode=g\n");
+        fprintf(fp, "ieee80211n=1\n");
+        fprintf(fp, "wmm_enabled=1\n");
         fprintf(fp, "ignore_broadcast_ssid=0\n");
         fprintf(fp, "auth_algs=1\n");
         fprintf(fp, "wpa=3\n");
@@ -189,7 +206,7 @@ static void page_wifi_update_services() {
         fclose(fp);
     }
 
-    if ((fp = fopen("/tmp/udhcpd.conf", "w"))) {
+    if ((fp = fopen(WIFI_DHCP_CFG, "w"))) {
         int ip[4];
         sscanf(g_setting.wifi.ip_addr, "%d.%d.%d.%d", &ip[3], &ip[2], &ip[1], &ip[0]);
         fprintf(fp, "start\t%d.%d.%d.100\n", ip[3], ip[2], ip[1]);
@@ -201,11 +218,10 @@ static void page_wifi_update_services() {
         fprintf(fp, "opt\twins\t0.0.0.0\n");
         fprintf(fp, "option\tdomain\tlocal\n");
         fprintf(fp, "option\tlease\t864000\n");
-
         fclose(fp);
     }
 
-    if ((fp = fopen("/tmp/wpa_supplicant.conf", "w"))) {
+    if ((fp = fopen(WIFI_STA_CFG, "w"))) {
         fprintf(fp, "ctrl_interface=/var/log/wpa_supplicant\n");
         fprintf(fp, "update_config=1\n");
         fprintf(fp, "network={\n");
@@ -217,7 +233,7 @@ static void page_wifi_update_services() {
 
     if (g_setting.wifi.mode == WIFI_MODE_STA &&
         !g_setting.wifi.dhcp &&
-        (fp = fopen("/tmp/resolv.conf", "w"))) {
+        (fp = fopen(WIFI_DNS_CFG, "w"))) {
         fprintf(fp, "nameserver %s\n", g_setting.wifi.dns);
         fprintf(fp, "options wlan0 trust-ad\n");
         fclose(fp);
@@ -232,10 +248,6 @@ static void page_wifi_update_services() {
         fprintf(fp, "EOF\n");
         fclose(fp);
         system_exec("chmod +x " ROOT_PW_SET "; " ROOT_PW_SET);
-    }
-
-    if (g_setting.wifi.ssh) {
-        system_exec("dropbear");
     }
 }
 
@@ -306,18 +318,28 @@ static void page_wifi_update_settings() {
     settings_put_bool("wifi", "ssh", g_setting.wifi.ssh);
 
     // Prepare WiFi interfaces
-    // system_script(WIFI_OFF);
+    // if (!page_wifi_bootup_pending) {
+    //     system_script(WIFI_OFF);
+    // }
     // page_wifi_update_services();
 
-    // Activate WiFi interface
+    // Activate WiFi services
     if (g_setting.wifi.enable) {
         if (g_app_state == APP_STATE_MAINMENU) {
+#if defined(HDZGOGGLE) || defined(HDZGOGGLE2)
             dvr_update_vi_conf(VR_1080P30);
+#elif defined(HDZBOXPRO)
+            dvr_update_vi_conf(VR_720P60);
+#endif
         }
         // if (WIFI_MODE_AP == g_setting.wifi.mode) {
         //     system_script(WIFI_AP_ON);
         // } else {
         //     system_script(WIFI_STA_ON);
+        // }
+
+        // if (g_setting.wifi.ssh) {
+        //     system_exec("dropbear");
         // }
     }
 }
@@ -357,7 +379,7 @@ static void page_wifi_update_page_1_notes() {
     }
 
     static char buf[1024];
-    snprintf(buf, sizeof(buf), "%s:\n    %s,%s.\n\n%s:\n    1. %s.\n    2. %s:\n\n        rtsp://%s:8554/hdzero\n\n",
+    snprintf(buf, sizeof(buf), "%s:\n    %s,%s.\n%s:\n    1. %s.\n    2. %s:\n        rtsp://%s:8554/hdzero\n",
              _lang("Password Requirements"),
              _lang("Minimum 8 characters"),
              _lang("maximum 64 characters"),
@@ -370,7 +392,7 @@ static void page_wifi_update_page_1_notes() {
 
 static void page_wifi_update_page_3_notes() {
     static char buf[256];
-    snprintf(buf, sizeof(buf), "%s:\n    %s,%s.\n\n",
+    snprintf(buf, sizeof(buf), "%s:\n    %s,%s.\n",
              _lang("Password Requirements"),
              _lang("Minimum 8 characters"),
              _lang("maximum 64 characters"));
@@ -651,10 +673,10 @@ static void page_wifi_create_page_1(lv_obj_t *parent) {
     page_wifi.page_1.back = create_label_item(parent, buf, 1, 6, 3);
 
     page_wifi.page_1.note = lv_label_create(parent);
-    lv_obj_set_style_text_font(page_wifi.page_1.note, &lv_font_montserrat_16, 0);
+    lv_obj_set_style_text_font(page_wifi.page_1.note, UI_PAGE_LABEL_FONT, 0);
     lv_obj_set_style_text_align(page_wifi.page_1.note, LV_TEXT_ALIGN_LEFT, 0);
-    lv_obj_set_style_text_color(page_wifi.page_1.note, lv_color_make(255, 255, 255), 0);
-    lv_obj_set_style_pad_top(page_wifi.page_1.note, 12, 0);
+    lv_obj_set_style_text_color(page_wifi.page_1.note, lv_color_hex(TEXT_COLOR_DEFAULT), 0);
+    lv_obj_set_style_pad_top(page_wifi.page_1.note, UI_PAGE_TEXT_PAD, 0);
     lv_label_set_long_mode(page_wifi.page_1.note, LV_LABEL_LONG_WRAP);
     lv_obj_set_grid_cell(page_wifi.page_1.note, LV_GRID_ALIGN_START, 1, 4, LV_GRID_ALIGN_START, 7, 2);
 
@@ -698,13 +720,14 @@ static void page_wifi_create_page_3(lv_obj_t *parent) {
 
     create_btn_group_item(&page_wifi.page_3.ssh.button, parent, 2, "SSH", _lang("On"), _lang("Off"), "", "", 2);
     btn_group_set_sel(&page_wifi.page_3.ssh.button, !g_setting.wifi.ssh);
+
     page_wifi.page_3.apply_settings = create_label_item(parent, "Apply Settings", 1, 3, 3);
 
     page_wifi.page_3.note = lv_label_create(parent);
-    lv_obj_set_style_text_font(page_wifi.page_3.note, &lv_font_montserrat_16, 0);
+    lv_obj_set_style_text_font(page_wifi.page_3.note, UI_PAGE_LABEL_FONT, 0);
     lv_obj_set_style_text_align(page_wifi.page_3.note, LV_TEXT_ALIGN_LEFT, 0);
-    lv_obj_set_style_text_color(page_wifi.page_3.note, lv_color_make(255, 255, 255), 0);
-    lv_obj_set_style_pad_top(page_wifi.page_3.note, 12, 0);
+    lv_obj_set_style_text_color(page_wifi.page_3.note, lv_color_hex(TEXT_COLOR_DEFAULT), 0);
+    lv_obj_set_style_pad_top(page_wifi.page_3.note, UI_PAGE_TEXT_PAD, 0);
     lv_label_set_long_mode(page_wifi.page_3.note, LV_LABEL_LONG_WRAP);
     lv_obj_set_grid_cell(page_wifi.page_3.note, LV_GRID_ALIGN_START, 1, 4, LV_GRID_ALIGN_START, 7, 2);
     page_wifi_update_page_3_notes();
@@ -722,19 +745,18 @@ static lv_obj_t *page_wifi_create(lv_obj_t *parent, panel_arr_t *arr) {
     char buf[128];
     lv_obj_t *page = lv_menu_page_create(parent, NULL);
     lv_obj_clear_flag(page, LV_OBJ_FLAG_SCROLLABLE);
-    lv_obj_set_size(page, 1053, 900);
+    lv_obj_set_size(page, UI_PAGE_VIEW_SIZE);
     lv_obj_add_style(page, &style_subpage, LV_PART_MAIN);
-    lv_obj_set_style_pad_top(page, 94, 0);
 
     lv_obj_t *section = lv_menu_section_create(page);
     lv_obj_add_style(section, &style_submenu, LV_PART_MAIN);
-    lv_obj_set_size(section, 1053, 894);
+    lv_obj_set_size(section, UI_PAGE_VIEW_SIZE);
 
     snprintf(buf, sizeof(buf), "%s:", _lang("WiFi Module"));
     create_text(NULL, section, false, buf, LV_MENU_ITEM_BUILDER_VARIANT_2);
 
     lv_obj_t *cont = lv_obj_create(section);
-    lv_obj_set_size(cont, 1280, 800);
+    lv_obj_set_size(cont, UI_PAGE_VIEW_SIZE);
     lv_obj_set_pos(cont, 0, 0);
     lv_obj_set_layout(cont, LV_LAYOUT_GRID);
     lv_obj_clear_flag(cont, LV_OBJ_FLAG_SCROLLABLE);
@@ -883,24 +905,24 @@ static void page_wifi_on_click(uint8_t key, int sel) {
     page_wifi.item_select = sel;
 
     switch (page_wifi.item_select) {
-    case 0:
+    case 0: // Page Toggle
         btn_group_toggle_sel(&page_wifi.page_select.button);
         page_wifi_update_current_page(btn_group_get_sel(&page_wifi.page_select.button));
         break;
     case 1:
         switch (btn_group_get_sel(&page_wifi.page_select.button)) {
-        case 0:
+        case 0: // Page Basic: Enable
             btn_group_toggle_sel(&page_wifi.page_1.enable.button);
             page_wifi.page_1.enable.dirty =
                 (btn_group_get_sel(&page_wifi.page_1.enable.button) != !g_setting.wifi.enable);
             break;
-        case 1:
+        case 1: // Page Advanced: DHCP
             btn_group_toggle_sel(&page_wifi.page_2.dhcp.button);
             page_wifi.page_2.dhcp.dirty =
                 (btn_group_get_sel(&page_wifi.page_2.dhcp.button) != !g_setting.wifi.dhcp);
             page_wifi_update_current_page(page_wifi.page_select.button.current);
             break;
-        case 2:
+        case 2: // Page System: Root PW
             if (!keyboard_active()) {
                 keyboard_set_text(page_wifi.page_3.root_pw.text);
                 keyboard_open();
@@ -912,7 +934,7 @@ static void page_wifi_on_click(uint8_t key, int sel) {
         break;
     case 2:
         switch (btn_group_get_sel(&page_wifi.page_select.button)) {
-        case 0:
+        case 0: // Page Basic: Mode
             btn_group_toggle_sel(&page_wifi.page_1.mode.button);
             int mode = btn_group_get_sel(&page_wifi.page_1.mode.button);
             lv_label_set_text(page_wifi.page_1.ssid.input, page_wifi.page_1.ssid.text[mode]);
@@ -920,7 +942,7 @@ static void page_wifi_on_click(uint8_t key, int sel) {
             page_wifi.page_1.mode.dirty =
                 (btn_group_get_sel(&page_wifi.page_1.mode.button) != g_setting.wifi.mode);
             break;
-        case 1:
+        case 1: // Page Advance: Address
             if (!keyboard_active()) {
                 keyboard_set_text(page_wifi.page_2.ip_addr.text);
                 keyboard_open();
@@ -928,7 +950,7 @@ static void page_wifi_on_click(uint8_t key, int sel) {
                 keyboard_press();
             }
             break;
-        case 2:
+        case 2: // Page System: SSH
             btn_group_toggle_sel(&page_wifi.page_3.ssh.button);
             page_wifi.page_3.ssh.dirty =
                 (btn_group_get_sel(&page_wifi.page_3.ssh.button) != !g_setting.wifi.ssh);
@@ -937,7 +959,7 @@ static void page_wifi_on_click(uint8_t key, int sel) {
         break;
     case 3:
         switch (btn_group_get_sel(&page_wifi.page_select.button)) {
-        case 0:
+        case 0: // Page Basic: SSID
             if (!keyboard_active()) {
                 int mode = btn_group_get_sel(&page_wifi.page_1.mode.button);
                 keyboard_set_text(page_wifi.page_1.ssid.text[mode]);
@@ -946,7 +968,7 @@ static void page_wifi_on_click(uint8_t key, int sel) {
                 keyboard_press();
             }
             break;
-        case 1:
+        case 1: // Page Advance: Netmask
             if (!keyboard_active()) {
                 keyboard_set_text(page_wifi.page_2.netmask.text);
                 keyboard_open();
@@ -954,14 +976,14 @@ static void page_wifi_on_click(uint8_t key, int sel) {
                 keyboard_press();
             }
             break;
-        case 2:
+        case 2: // Page System: Apply Settings
             page_wifi_handle_apply_button(page_wifi.page_3.apply_settings);
             break;
         }
         break;
     case 4:
         switch (btn_group_get_sel(&page_wifi.page_select.button)) {
-        case 0:
+        case 0: // Page Basic: Password
             if (!keyboard_active()) {
                 int mode = btn_group_get_sel(&page_wifi.page_1.mode.button);
                 keyboard_set_text(page_wifi.page_1.passwd.text[mode]);
@@ -970,7 +992,7 @@ static void page_wifi_on_click(uint8_t key, int sel) {
                 keyboard_press();
             }
             break;
-        case 1:
+        case 1: // Page Advanced: Gateway
             if (!keyboard_active()) {
                 keyboard_set_text(page_wifi.page_2.gateway.text);
                 keyboard_open();
@@ -982,10 +1004,10 @@ static void page_wifi_on_click(uint8_t key, int sel) {
         break;
     case 5:
         switch (btn_group_get_sel(&page_wifi.page_select.button)) {
-        case 0:
+        case 0: // Page Basic: Apply Settings
             page_wifi_handle_apply_button(page_wifi.page_1.apply_settings);
             break;
-        case 1:
+        case 1: // Page Advanced: DNS
             if (!keyboard_active()) {
                 keyboard_set_text(page_wifi.page_2.dns.text);
                 keyboard_open();
@@ -997,10 +1019,10 @@ static void page_wifi_on_click(uint8_t key, int sel) {
         break;
     case 6:
         switch (btn_group_get_sel(&page_wifi.page_select.button)) {
-        case 0:
+        case 0: // Page Basic: Back
             submenu_exit();
             break;
-        case 1:
+        case 1: // Page Advanced: RF Channel
             if (!page_wifi.page_2.rf_channel.active) {
                 page_wifi.page_2.rf_channel.active = true;
             } else {
@@ -1013,7 +1035,7 @@ static void page_wifi_on_click(uint8_t key, int sel) {
         break;
     case 7:
         switch (btn_group_get_sel(&page_wifi.page_select.button)) {
-        case 1:
+        case 1: // Page Advanced: Apply Settings
             page_wifi_handle_apply_button(page_wifi.page_2.apply_settings);
             break;
         }
@@ -1153,7 +1175,7 @@ void page_wifi_post_bootup_action(void (*complete_callback)()) {
     page_wifi_update_settings();
 
     if (complete_callback != NULL) {
-        page_wifi_pending = false;
+        page_wifi_bootup_pending = false;
         complete_callback();
     }
 }
@@ -1184,24 +1206,22 @@ page_pack_t pp_wifi = {
  * Provides the WiFi status string referenced by ui_statusbar.
  */
 void page_wifi_get_statusbar_text(char *buffer, int size) {
-    if (!page_wifi_pending) {
-        if (g_setting.wifi.enable) {
-            switch (g_setting.wifi.mode) {
-            case WIFI_MODE_AP:
-                snprintf(buffer, size, "WiFi: %s", g_setting.wifi.ssid[WIFI_MODE_AP]);
-                break;
-            case WIFI_MODE_STA:
-                if (page_wifi_get_real_address()) {
-                    snprintf(buffer, size, "WiFi: %s", g_setting.wifi.ssid[WIFI_MODE_STA]);
-                } else {
-                    snprintf(buffer, size, "WiFi: %s", _lang("Searching"));
-                }
-                break;
-            }
-        } else {
-            snprintf(buffer, size, "WiFi: %s", _lang("Off"));
-        }
-    } else {
+    if (!g_setting.wifi.enable) {
+        snprintf(buffer, size, "WiFi: %s", _lang("Off"));
+    } else if (page_wifi_bootup_pending) {
         snprintf(buffer, size, "WiFi: %s", _lang("Pending"));
+    } else {
+        switch (g_setting.wifi.mode) {
+        case WIFI_MODE_AP:
+            snprintf(buffer, size, "WiFi: %s", g_setting.wifi.ssid[WIFI_MODE_AP]);
+            break;
+        case WIFI_MODE_STA:
+            if (page_wifi_get_real_address()) {
+                snprintf(buffer, size, "WiFi: %s", g_setting.wifi.ssid[WIFI_MODE_STA]);
+            } else {
+                snprintf(buffer, size, "WiFi: %s", _lang("Searching"));
+            }
+            break;
+        }
     }
 }

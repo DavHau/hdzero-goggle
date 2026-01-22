@@ -24,6 +24,10 @@ extern "C" {
 #define WIFI_OFF      "/mnt/app/script/wlan_stop.sh"
 #define WIFI_AP_ON    "/tmp/wlan_start_ap.sh"
 #define WIFI_STA_ON   "/tmp/wlan_start_sta.sh"
+#define WIFI_AP_CFG   "/tmp/hostapd.conf"
+#define WIFI_DHCP_CFG "/tmp/udhcpd.conf"
+#define WIFI_STA_CFG  "/tmp/wpa_supplicant.conf"
+#define WIFI_DNS_CFG  "/tmp/resolv.conf"
 #define ROOT_PW_SET   "/tmp/root_pw_set.sh"
 
 #define FC_OSD_LOCAL_PATH  "/mnt/app/resource/OSD/FC/"
@@ -84,7 +88,7 @@ typedef enum {
     SOURCE_HDZERO = 0,
     SOURCE_HDMI_IN = 1,
     SOURCE_AV_IN = 2,
-    SOURCE_EXPANSION = 3
+    SOURCE_AV_MODULE = 3
 } source_t;
 
 typedef struct _source_info {

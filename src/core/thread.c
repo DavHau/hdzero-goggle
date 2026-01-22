@@ -23,7 +23,8 @@
 #include "driver/hardware.h"
 #include "driver/it66021.h"
 #include "driver/nct75.h"
-#include "driver/oled.h"
+#include "driver/rtc6715.h"
+#include "driver/screen.h"
 #include "ui/page_fans.h"
 #include "ui/page_storage.h"
 #include "ui/page_version.h"
@@ -113,13 +114,17 @@ static void check_source_signal(int vtmg_change) {
         DM5680_req_rssi();
         DM5680_req_vldflg();
         tune_channel_timer();
+    } else if (g_source_info.source == SOURCE_AV_MODULE) {
+#if defined(HDZGOGGLE2) || defined(HDZBOXPRO)
+        tune_channel_timer();
+#endif
     }
 
     if (g_source_info.source == SOURCE_HDMI_IN)
         is_valid = g_source_info.hdmi_in_status;
     else if (g_source_info.source == SOURCE_AV_IN)
         is_valid = g_source_info.av_in_status;
-    else if (g_source_info.source == SOURCE_EXPANSION)
+    else if (g_source_info.source == SOURCE_AV_MODULE)
         is_valid = g_source_info.av_bay_status;
     else
         is_valid = (rx_status[0].rx_valid || rx_status[1].rx_valid);
@@ -129,7 +134,7 @@ static void check_source_signal(int vtmg_change) {
     }
 
     // exit if no SD card or not in video mode
-    if ((g_setting.record.mode_manual && (g_source_info.source != SOURCE_HDMI_IN)) || (!g_sdcard_enable) || (g_app_state != APP_STATE_VIDEO))
+    if (g_setting.record.mode_manual || (!g_sdcard_enable) || (g_app_state != APP_STATE_VIDEO))
         return;
 
     // Analog VTMG change -> Restart recording
@@ -196,9 +201,15 @@ static void *thread_peripheral(void *ptr) {
             if (k++ == 4) {
                 k = 0;
                 battery_update();
+
+#if defined(HDZBOXPRO)
+                // note boxpro have only one nct75
+                g_temperature.top = nct_read_temperature(NCT_RIGHT);
+#elif defined(HDZGOGGLE) || defined(HDZGOGGLE2)
                 g_temperature.top = nct_read_temperature(NCT_TOP);
                 g_temperature.left = nct_read_temperature(NCT_LEFT) + 100;
                 g_temperature.right = nct_read_temperature(NCT_RIGHT);
+#endif
                 dvr_update_status();
             }
             // detect HDZERO
@@ -206,8 +217,8 @@ static void *thread_peripheral(void *ptr) {
 
             // detect AV_in/Moudle_bay
             record_vtmg_change |= AV_in_detect();
-            g_source_info.av_in_status = g_hw_stat.av_valid[0];
-            g_source_info.av_bay_status = g_hw_stat.av_valid[1];
+            g_source_info.av_in_status = g_hw_stat.av_valid[1];
+            g_source_info.av_bay_status = g_hw_stat.av_valid[0];
 
             // detect HDMI in
             record_vtmg_change |= HDMI_in_detect();
@@ -231,6 +242,7 @@ static void threads_instance(threads_obj_t *obj) {
     obj->instance[0] = thread_peripheral;
     obj->instance[1] = thread_version;
     obj->instance[2] = thread_osd;
+    obj->instance[3] = thread_rtc6715_rssi;
 }
 
 int create_threads() {
