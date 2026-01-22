@@ -2,7 +2,8 @@
   pkgs,
   packages,
   ...
-}: {
+}:
+{
   boot.extraModulePackages = [
     packages.kernel-modules
   ];
@@ -21,8 +22,7 @@
   systemd.services.hdzero = {
     description = "hdzero goggle app";
     wantedBy = [ "multi-user.target" ];
-    after = ["mnt-config.mount" "systemd-modules-load.service" "systemd-tmpfiles-setup.service"];
-    before = ["systemd-sysctl.service"];
+    before = [ "systemd-sysctl.service" ];
     unitConfig.DefaultDependencies = false;
     serviceConfig = {
       Restart = "always";

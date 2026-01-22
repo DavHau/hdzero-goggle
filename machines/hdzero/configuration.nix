@@ -4,7 +4,8 @@
   lib,
   packages,
   ...
-}: {
+}:
+{
   imports = [
     ./modules/wifi.nix
     ./modules/hdzero.nix
@@ -62,10 +63,9 @@
     "${packages.kernel-modules}/lib/modules";
   systemd.services.systemd-modules-load.after = [ "systemd-tmpfiles-setup.service" ];
 
-
   fileSystems."/" = {
     device = "/dev/disk/by-label/nixos";
-    autoResize = true;
+    # autoResize = true;
     fsType = "ext4";
   };
   fileSystems."/mnt/config" = {

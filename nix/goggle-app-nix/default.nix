@@ -251,7 +251,7 @@ stdenv.mkDerivation {
   installPhase = ''
     mkdir -p $out/bin
     mv HDZGOGGLE record rtspLive $out/bin
-    mv ../mkapp/app $out/
+    mv ./mkapp/app $out/
   '';
   # build the app.ext2 after binaries have been fixed
   postFixup = ''
