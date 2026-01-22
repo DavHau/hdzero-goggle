@@ -4,7 +4,8 @@
 # In case of questions, feel free to ask @DavHau
 {
   inputs = {
-    nixpkgs.url = "git+https://github.com/nixos/nixpkgs?shallow=1&ref=nixos-25.11";
+    # from nixos-25.11 on, systemd is incompatible with the outdated kernel 4.9 used by hdzero
+    nixpkgs.url = "git+https://github.com/nixos/nixpkgs?shallow=1&ref=nixos-25.05";
     nixpkgs_unstable.url = "git+https://github.com/nixos/nixpkgs?shallow=1&ref=nixos-unstable";
     nixpkgs_22_05.url = "github:nixos/nixpkgs/nixos-22.05";
     nix-filter.url = "github:numtide/nix-filter";
@@ -46,22 +47,23 @@
         config.pulseaudio = false;
         overlays = [
           (curr: prev: {
-            ffmpeg =
-              (curr.ffmpeg_6-headless.override {
-                withVaapi = false;
-              }).overrideAttrs
-                (old: {
-                  patches = lib.filter (
-                    patch: !(lib.hasInfix "binutils" "${patch}" || lib.hasInfix "nvccflags-cpp14" "${patch}")
-                  ) prev.ffmpeg_6-headless.patches;
-                });
+            ffmpeg = curr.ffmpeg_6-headless.override {
+              withVaapi = false;
+            };
+            # patch needed for nixpkgs 25.11 (not yet used because systemd incompatibility)
+            # ffmpeg =
+            #   (curr.ffmpeg_6-headless.override {
+            #     withVaapi = false;
+            #   }).overrideAttrs
+            #     (old: {
+            #       patches = lib.filter (
+            #         patch: !(lib.hasInfix "binutils" "${patch}" || lib.hasInfix "nvccflags-cpp14" "${patch}")
+            #       ) prev.ffmpeg_6-headless.patches;
+            #     });
             mpg123 = prev.mpg123.override {
               withPulse = false;
               withJack = false;
             };
-            docker-compose = prev.docker-compose.overrideAttrs (old: {
-              vendorHash = "sha256-6KLdDBuPiB/qh+3IfABu8Gvopu5ucTrNg9jh7G+cMss=";
-            });
           })
         ];
       };
