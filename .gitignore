@@ -23,3 +23,6 @@ utilities/font/out
 # nix related
 result
 result-*
+
+# clangd
+.cache
