@@ -1,0 +1,9 @@
+pinctrl-devices  pinctrl-handles  pinctrl-maps  pio  r_pio
+/sys/kernel/debug/pinctrl/pio/:
+gpio-ranges     pinconf-groups  pingroups         pinmux-pins
+pinconf-config  pinconf-pins    pinmux-functions  pins
+
+/sys/kernel/debug/pinctrl/r_pio/:
+gpio-ranges     pinconf-groups  pingroups         pinmux-pins
+pinconf-config  pinconf-pins    pinmux-functions  pins
+

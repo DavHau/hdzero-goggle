@@ -1,0 +1,2251 @@
+Pinctrl maps:
+device spi0
+state default
+type MUX_GROUP (2)
+controlling device pio
+group PC1
+function spi0
+
+device spi0
+state default
+type CONFIGS_GROUP (4)
+controlling device pio
+group PC1
+config 00000005
+config 00000000
+config 00000000
+
+device spi0
+state default
+type MUX_GROUP (2)
+controlling device pio
+group PC10
+function spi0
+
+device spi0
+state default
+type CONFIGS_GROUP (4)
+controlling device pio
+group PC10
+config 00000005
+config 00000000
+config 00000000
+
+device spi0
+state default
+type MUX_GROUP (2)
+controlling device pio
+group PC0
+function spi0
+
+device spi0
+state default
+type CONFIGS_GROUP (4)
+controlling device pio
+group PC0
+config 00000000
+config 00000000
+config 00000000
+
+device spi0
+state default
+type MUX_GROUP (2)
+controlling device pio
+group PC2
+function spi0
+
+device spi0
+state default
+type CONFIGS_GROUP (4)
+controlling device pio
+group PC2
+config 00000000
+config 00000000
+config 00000000
+
+device spi0
+state default
+type MUX_GROUP (2)
+controlling device pio
+group PC3
+function spi0
+
+device spi0
+state default
+type CONFIGS_GROUP (4)
+controlling device pio
+group PC3
+config 00000000
+config 00000000
+config 00000000
+
+device spi0
+state default
+type MUX_GROUP (2)
+controlling device pio
+group PC14
+function spi0
+
+device spi0
+state default
+type CONFIGS_GROUP (4)
+controlling device pio
+group PC14
+config 00000000
+config 00000000
+config 00000000
+
+device spi0
+state default
+type MUX_GROUP (2)
+controlling device pio
+group PC13
+function spi0
+
+device spi0
+state default
+type CONFIGS_GROUP (4)
+controlling device pio
+group PC13
+config 00000000
+config 00000000
+config 00000000
+
+device spi0
+state sleep
+type MUX_GROUP (2)
+controlling device pio
+group PC1
+function io_disabled
+
+device spi0
+state sleep
+type CONFIGS_GROUP (4)
+controlling device pio
+group PC1
+config 00000000
+config 00000000
+config 00000000
+
+device spi0
+state sleep
+type MUX_GROUP (2)
+controlling device pio
+group PC10
+function io_disabled
+
+device spi0
+state sleep
+type CONFIGS_GROUP (4)
+controlling device pio
+group PC10
+config 00000000
+config 00000000
+config 00000000
+
+device spi0
+state sleep
+type MUX_GROUP (2)
+controlling device pio
+group PC0
+function io_disabled
+
+device spi0
+state sleep
+type CONFIGS_GROUP (4)
+controlling device pio
+group PC0
+config 00000000
+config 00000000
+config 00000000
+
+device spi0
+state sleep
+type MUX_GROUP (2)
+controlling device pio
+group PC2
+function io_disabled
+
+device spi0
+state sleep
+type CONFIGS_GROUP (4)
+controlling device pio
+group PC2
+config 00000000
+config 00000000
+config 00000000
+
+device spi0
+state sleep
+type MUX_GROUP (2)
+controlling device pio
+group PC3
+function io_disabled
+
+device spi0
+state sleep
+type CONFIGS_GROUP (4)
+controlling device pio
+group PC3
+config 00000000
+config 00000000
+config 00000000
+
+device spi0
+state sleep
+type MUX_GROUP (2)
+controlling device pio
+group PC14
+function io_disabled
+
+device spi0
+state sleep
+type CONFIGS_GROUP (4)
+controlling device pio
+group PC14
+config 00000000
+config 00000000
+config 00000000
+
+device spi0
+state sleep
+type MUX_GROUP (2)
+controlling device pio
+group PC13
+function io_disabled
+
+device spi0
+state sleep
+type CONFIGS_GROUP (4)
+controlling device pio
+group PC13
+config 00000000
+config 00000000
+config 00000000
+
+device spi1
+state default
+type MUX_GROUP (2)
+controlling device pio
+group PH14
+function spi1
+
+device spi1
+state default
+type CONFIGS_GROUP (4)
+controlling device pio
+group PH14
+config 00000005
+config 00000000
+config 00000000
+
+device spi1
+state default
+type MUX_GROUP (2)
+controlling device pio
+group PH15
+function spi1
+
+device spi1
+state default
+type CONFIGS_GROUP (4)
+controlling device pio
+group PH15
+config 00000005
+config 00000000
+config 00000000
+
+device spi1
+state default
+type MUX_GROUP (2)
+controlling device pio
+group PH11
+function spi1
+
+device spi1
+state default
+type CONFIGS_GROUP (4)
+controlling device pio
+group PH11
+config 00000000
+config 00000000
+config 00000000
+
+device spi1
+state default
+type MUX_GROUP (2)
+controlling device pio
+group PH12
+function spi1
+
+device spi1
+state default
+type CONFIGS_GROUP (4)
+controlling device pio
+group PH12
+config 00000000
+config 00000000
+config 00000000
+
+device spi1
+state default
+type MUX_GROUP (2)
+controlling device pio
+group PH13
+function spi1
+
+device spi1
+state default
+type CONFIGS_GROUP (4)
+controlling device pio
+group PH13
+config 00000000
+config 00000000
+config 00000000
+
+device spi1
+state sleep
+type MUX_GROUP (2)
+controlling device pio
+group PH14
+function io_disabled
+
+device spi1
+state sleep
+type CONFIGS_GROUP (4)
+controlling device pio
+group PH14
+config 00000000
+config 00000000
+config 00000000
+
+device spi1
+state sleep
+type MUX_GROUP (2)
+controlling device pio
+group PH15
+function io_disabled
+
+device spi1
+state sleep
+type CONFIGS_GROUP (4)
+controlling device pio
+group PH15
+config 00000000
+config 00000000
+config 00000000
+
+device spi1
+state sleep
+type MUX_GROUP (2)
+controlling device pio
+group PH11
+function io_disabled
+
+device spi1
+state sleep
+type CONFIGS_GROUP (4)
+controlling device pio
+group PH11
+config 00000000
+config 00000000
+config 00000000
+
+device spi1
+state sleep
+type MUX_GROUP (2)
+controlling device pio
+group PH12
+function io_disabled
+
+device spi1
+state sleep
+type CONFIGS_GROUP (4)
+controlling device pio
+group PH12
+config 00000000
+config 00000000
+config 00000000
+
+device spi1
+state sleep
+type MUX_GROUP (2)
+controlling device pio
+group PH13
+function io_disabled
+
+device spi1
+state sleep
+type CONFIGS_GROUP (4)
+controlling device pio
+group PH13
+config 00000000
+config 00000000
+config 00000000
+
+device spi3
+state default
+type MUX_GROUP (2)
+controlling device pio
+group PI6
+function spi3
+
+device spi3
+state default
+type CONFIGS_GROUP (4)
+controlling device pio
+group PI6
+config 00000005
+config 00000000
+config 00000000
+
+device spi3
+state default
+type MUX_GROUP (2)
+controlling device pio
+group PI3
+function spi3
+
+device spi3
+state default
+type CONFIGS_GROUP (4)
+controlling device pio
+group PI3
+config 00000000
+config 00000000
+config 00000000
+
+device spi3
+state default
+type MUX_GROUP (2)
+controlling device pio
+group PI4
+function spi3
+
+device spi3
+state default
+type CONFIGS_GROUP (4)
+controlling device pio
+group PI4
+config 00000000
+config 00000000
+config 00000000
+
+device spi3
+state default
+type MUX_GROUP (2)
+controlling device pio
+group PI5
+function spi3
+
+device spi3
+state default
+type CONFIGS_GROUP (4)
+controlling device pio
+group PI5
+config 00000000
+config 00000000
+config 00000000
+
+device spi3
+state sleep
+type MUX_GROUP (2)
+controlling device pio
+group PI6
+function io_disabled
+
+device spi3
+state sleep
+type CONFIGS_GROUP (4)
+controlling device pio
+group PI6
+config 00000000
+config 00000000
+config 00000000
+
+device spi3
+state sleep
+type MUX_GROUP (2)
+controlling device pio
+group PI3
+function io_disabled
+
+device spi3
+state sleep
+type CONFIGS_GROUP (4)
+controlling device pio
+group PI3
+config 00000000
+config 00000000
+config 00000000
+
+device spi3
+state sleep
+type MUX_GROUP (2)
+controlling device pio
+group PI4
+function io_disabled
+
+device spi3
+state sleep
+type CONFIGS_GROUP (4)
+controlling device pio
+group PI4
+config 00000000
+config 00000000
+config 00000000
+
+device spi3
+state sleep
+type MUX_GROUP (2)
+controlling device pio
+group PI5
+function io_disabled
+
+device spi3
+state sleep
+type CONFIGS_GROUP (4)
+controlling device pio
+group PI5
+config 00000000
+config 00000000
+config 00000000
+
+device twi1
+state default
+type MUX_GROUP (2)
+controlling device pio
+group PE16
+function twi1
+
+device twi1
+state default
+type CONFIGS_GROUP (4)
+controlling device pio
+group PE16
+config 00000000
+config 00000000
+config 00000000
+
+device twi1
+state default
+type MUX_GROUP (2)
+controlling device pio
+group PE17
+function twi1
+
+device twi1
+state default
+type CONFIGS_GROUP (4)
+controlling device pio
+group PE17
+config 00000000
+config 00000000
+config 00000000
+
+device twi1
+state sleep
+type MUX_GROUP (2)
+controlling device pio
+group PE16
+function io_disabled
+
+device twi1
+state sleep
+type CONFIGS_GROUP (4)
+controlling device pio
+group PE16
+config 00000000
+config 00000000
+config 00000000
+
+device twi1
+state sleep
+type MUX_GROUP (2)
+controlling device pio
+group PE17
+function io_disabled
+
+device twi1
+state sleep
+type CONFIGS_GROUP (4)
+controlling device pio
+group PE17
+config 00000000
+config 00000000
+config 00000000
+
+device twi2
+state default
+type MUX_GROUP (2)
+controlling device pio
+group PH9
+function twi2
+
+device twi2
+state default
+type CONFIGS_GROUP (4)
+controlling device pio
+group PH9
+config 00000000
+config 00000000
+config 00000000
+
+device twi2
+state default
+type MUX_GROUP (2)
+controlling device pio
+group PH10
+function twi2
+
+device twi2
+state default
+type CONFIGS_GROUP (4)
+controlling device pio
+group PH10
+config 00000000
+config 00000000
+config 00000000
+
+device twi2
+state sleep
+type MUX_GROUP (2)
+controlling device pio
+group PH9
+function io_disabled
+
+device twi2
+state sleep
+type CONFIGS_GROUP (4)
+controlling device pio
+group PH9
+config 00000000
+config 00000000
+config 00000000
+
+device twi2
+state sleep
+type MUX_GROUP (2)
+controlling device pio
+group PH10
+function io_disabled
+
+device twi2
+state sleep
+type CONFIGS_GROUP (4)
+controlling device pio
+group PH10
+config 00000000
+config 00000000
+config 00000000
+
+device twi3
+state default
+type MUX_GROUP (2)
+controlling device pio
+group PI0
+function twi3
+
+device twi3
+state default
+type CONFIGS_GROUP (4)
+controlling device pio
+group PI0
+config 00000000
+config 00000000
+config 00000000
+
+device twi3
+state default
+type MUX_GROUP (2)
+controlling device pio
+group PI1
+function twi3
+
+device twi3
+state default
+type CONFIGS_GROUP (4)
+controlling device pio
+group PI1
+config 00000000
+config 00000000
+config 00000000
+
+device twi3
+state sleep
+type MUX_GROUP (2)
+controlling device pio
+group PI0
+function io_disabled
+
+device twi3
+state sleep
+type CONFIGS_GROUP (4)
+controlling device pio
+group PI0
+config 00000000
+config 00000000
+config 00000000
+
+device twi3
+state sleep
+type MUX_GROUP (2)
+controlling device pio
+group PI1
+function io_disabled
+
+device twi3
+state sleep
+type CONFIGS_GROUP (4)
+controlling device pio
+group PI1
+config 00000000
+config 00000000
+config 00000000
+
+device rotary_axis
+state default
+type MUX_GROUP (2)
+controlling device r_pio
+group PL12
+function gpio_in
+
+device rotary_axis
+state default
+type CONFIGS_GROUP (4)
+controlling device r_pio
+group PL12
+config 00000a09
+config 00000005
+
+device rotary_axis
+state default
+type MUX_GROUP (2)
+controlling device r_pio
+group PL13
+function gpio_in
+
+device rotary_axis
+state default
+type CONFIGS_GROUP (4)
+controlling device r_pio
+group PL13
+config 00000a09
+config 00000005
+
+device uart0
+state default
+type MUX_GROUP (2)
+controlling device pio
+group PH7
+function uart0
+
+device uart0
+state default
+type CONFIGS_GROUP (4)
+controlling device pio
+group PH7
+config 00000005
+config 00000000
+config 00000000
+
+device uart0
+state default
+type MUX_GROUP (2)
+controlling device pio
+group PH8
+function uart0
+
+device uart0
+state default
+type CONFIGS_GROUP (4)
+controlling device pio
+group PH8
+config 00000005
+config 00000000
+config 00000000
+
+device uart0
+state sleep
+type MUX_GROUP (2)
+controlling device pio
+group PH7
+function io_disabled
+
+device uart0
+state sleep
+type CONFIGS_GROUP (4)
+controlling device pio
+group PH7
+config 00001409
+config 00000001
+
+device uart0
+state sleep
+type MUX_GROUP (2)
+controlling device pio
+group PH8
+function io_disabled
+
+device uart0
+state sleep
+type CONFIGS_GROUP (4)
+controlling device pio
+group PH8
+config 00001409
+config 00000001
+
+device uart2
+state default
+type MUX_GROUP (2)
+controlling device pio
+group PE18
+function lcd0
+
+device uart2
+state default
+type CONFIGS_GROUP (4)
+controlling device pio
+group PE18
+config 00000005
+config 00000000
+config 00000000
+
+device uart2
+state default
+type MUX_GROUP (2)
+controlling device pio
+group PE19
+function lcd0
+
+device uart2
+state default
+type CONFIGS_GROUP (4)
+controlling device pio
+group PE19
+config 00000005
+config 00000000
+config 00000000
+
+device uart2
+state sleep
+type MUX_GROUP (2)
+controlling device pio
+group PE18
+function io_disabled
+
+device uart2
+state sleep
+type CONFIGS_GROUP (4)
+controlling device pio
+group PE18
+config 00001409
+config 00000001
+
+device uart2
+state sleep
+type MUX_GROUP (2)
+controlling device pio
+group PE19
+function io_disabled
+
+device uart2
+state sleep
+type CONFIGS_GROUP (4)
+controlling device pio
+group PE19
+config 00001409
+config 00000001
+
+device uart3
+state default
+type MUX_GROUP (2)
+controlling device pio
+group PH5
+function jtag0
+
+device uart3
+state default
+type CONFIGS_GROUP (4)
+controlling device pio
+group PH5
+config 00000005
+config 00000000
+config 00000000
+
+device uart3
+state default
+type MUX_GROUP (2)
+controlling device pio
+group PH6
+function jtag0
+
+device uart3
+state default
+type CONFIGS_GROUP (4)
+controlling device pio
+group PH6
+config 00000005
+config 00000000
+config 00000000
+
+device uart3
+state sleep
+type MUX_GROUP (2)
+controlling device pio
+group PG10
+function io_disabled
+
+device uart3
+state sleep
+type CONFIGS_GROUP (4)
+controlling device pio
+group PG10
+config 00001409
+config 00000001
+
+device uart3
+state sleep
+type MUX_GROUP (2)
+controlling device pio
+group PG11
+function io_disabled
+
+device uart3
+state sleep
+type CONFIGS_GROUP (4)
+controlling device pio
+group PG11
+config 00001409
+config 00000001
+
+device uart3
+state sleep
+type MUX_GROUP (2)
+controlling device pio
+group PG12
+function io_disabled
+
+device uart3
+state sleep
+type CONFIGS_GROUP (4)
+controlling device pio
+group PG12
+config 00001409
+config 00000001
+
+device uart3
+state sleep
+type MUX_GROUP (2)
+controlling device pio
+group PG13
+function io_disabled
+
+device uart3
+state sleep
+type CONFIGS_GROUP (4)
+controlling device pio
+group PG13
+config 00001409
+config 00000001
+
+device uart4
+state default
+type MUX_GROUP (2)
+controlling device pio
+group PH0
+function uart4
+
+device uart4
+state default
+type CONFIGS_GROUP (4)
+controlling device pio
+group PH0
+config 00000005
+config 00000000
+config 00000000
+
+device uart4
+state default
+type MUX_GROUP (2)
+controlling device pio
+group PH1
+function uart4
+
+device uart4
+state default
+type CONFIGS_GROUP (4)
+controlling device pio
+group PH1
+config 00000005
+config 00000000
+config 00000000
+
+device uart4
+state sleep
+type MUX_GROUP (2)
+controlling device pio
+group PH0
+function io_disabled
+
+device uart4
+state sleep
+type CONFIGS_GROUP (4)
+controlling device pio
+group PH0
+config 00001409
+config 00000001
+
+device uart4
+state sleep
+type MUX_GROUP (2)
+controlling device pio
+group PH1
+function io_disabled
+
+device uart4
+state sleep
+type CONFIGS_GROUP (4)
+controlling device pio
+group PH1
+config 00001409
+config 00000001
+
+device uart4
+state sleep
+type MUX_GROUP (2)
+controlling device pio
+group PH15
+function io_disabled
+
+device uart4
+state sleep
+type CONFIGS_GROUP (4)
+controlling device pio
+group PH15
+config 00001409
+config 00000001
+
+device uart4
+state sleep
+type MUX_GROUP (2)
+controlling device pio
+group PH14
+function io_disabled
+
+device uart4
+state sleep
+type CONFIGS_GROUP (4)
+controlling device pio
+group PH14
+config 00001409
+config 00000001
+
+device sdc0
+state default
+type MUX_GROUP (2)
+controlling device pio
+group PF0
+function sdc0
+
+device sdc0
+state default
+type CONFIGS_GROUP (4)
+controlling device pio
+group PF0
+config 00002809
+config 00000005
+config 00000000
+
+device sdc0
+state default
+type MUX_GROUP (2)
+controlling device pio
+group PF1
+function sdc0
+
+device sdc0
+state default
+type CONFIGS_GROUP (4)
+controlling device pio
+group PF1
+config 00002809
+config 00000005
+config 00000000
+
+device sdc0
+state default
+type MUX_GROUP (2)
+controlling device pio
+group PF2
+function sdc0
+
+device sdc0
+state default
+type CONFIGS_GROUP (4)
+controlling device pio
+group PF2
+config 00002809
+config 00000005
+config 00000000
+
+device sdc0
+state default
+type MUX_GROUP (2)
+controlling device pio
+group PF3
+function sdc0
+
+device sdc0
+state default
+type CONFIGS_GROUP (4)
+controlling device pio
+group PF3
+config 00002809
+config 00000005
+config 00000000
+
+device sdc0
+state default
+type MUX_GROUP (2)
+controlling device pio
+group PF5
+function sdc0
+
+device sdc0
+state default
+type CONFIGS_GROUP (4)
+controlling device pio
+group PF5
+config 00002809
+config 00000005
+config 00000000
+
+device sdc0
+state default
+type MUX_GROUP (2)
+controlling device pio
+group PF4
+function sdc0
+
+device sdc0
+state default
+type CONFIGS_GROUP (4)
+controlling device pio
+group PF4
+config 00002809
+config 00000001
+config 00000000
+
+device sdc0
+state sleep
+type MUX_GROUP (2)
+controlling device pio
+group PF0
+function io_disabled
+
+device sdc0
+state sleep
+type CONFIGS_GROUP (4)
+controlling device pio
+group PF0
+config 00001409
+config 00000005
+
+device sdc0
+state sleep
+type MUX_GROUP (2)
+controlling device pio
+group PF1
+function io_disabled
+
+device sdc0
+state sleep
+type CONFIGS_GROUP (4)
+controlling device pio
+group PF1
+config 00001409
+config 00000005
+
+device sdc0
+state sleep
+type MUX_GROUP (2)
+controlling device pio
+group PF2
+function io_disabled
+
+device sdc0
+state sleep
+type CONFIGS_GROUP (4)
+controlling device pio
+group PF2
+config 00001409
+config 00000005
+
+device sdc0
+state sleep
+type MUX_GROUP (2)
+controlling device pio
+group PF3
+function io_disabled
+
+device sdc0
+state sleep
+type CONFIGS_GROUP (4)
+controlling device pio
+group PF3
+config 00001409
+config 00000005
+
+device sdc0
+state sleep
+type MUX_GROUP (2)
+controlling device pio
+group PF4
+function io_disabled
+
+device sdc0
+state sleep
+type CONFIGS_GROUP (4)
+controlling device pio
+group PF4
+config 00001409
+config 00000005
+
+device sdc0
+state sleep
+type MUX_GROUP (2)
+controlling device pio
+group PF5
+function io_disabled
+
+device sdc0
+state sleep
+type CONFIGS_GROUP (4)
+controlling device pio
+group PF5
+config 00001409
+config 00000005
+
+device sdc0
+state uart_jtag
+type MUX_GROUP (2)
+controlling device pio
+group PF0
+function jtag0
+
+device sdc0
+state uart_jtag
+type CONFIGS_GROUP (4)
+controlling device pio
+group PF0
+config 00001409
+config 00000005
+
+device sdc0
+state uart_jtag
+type MUX_GROUP (2)
+controlling device pio
+group PF1
+function jtag0
+
+device sdc0
+state uart_jtag
+type CONFIGS_GROUP (4)
+controlling device pio
+group PF1
+config 00001409
+config 00000005
+
+device sdc0
+state uart_jtag
+type MUX_GROUP (2)
+controlling device pio
+group PF2
+function uart0
+
+device sdc0
+state uart_jtag
+type CONFIGS_GROUP (4)
+controlling device pio
+group PF2
+config 00001409
+config 00000005
+
+device sdc0
+state uart_jtag
+type MUX_GROUP (2)
+controlling device pio
+group PF3
+function jtag0
+
+device sdc0
+state uart_jtag
+type CONFIGS_GROUP (4)
+controlling device pio
+group PF3
+config 00001409
+config 00000005
+
+device sdc0
+state uart_jtag
+type MUX_GROUP (2)
+controlling device pio
+group PF4
+function uart0
+
+device sdc0
+state uart_jtag
+type CONFIGS_GROUP (4)
+controlling device pio
+group PF4
+config 00001409
+config 00000005
+
+device sdc0
+state uart_jtag
+type MUX_GROUP (2)
+controlling device pio
+group PF5
+function jtag0
+
+device sdc0
+state uart_jtag
+type CONFIGS_GROUP (4)
+controlling device pio
+group PF5
+config 00001409
+config 00000005
+
+device sdc1
+state default
+type MUX_GROUP (2)
+controlling device pio
+group PG0
+function sdc1
+
+device sdc1
+state default
+type CONFIGS_GROUP (4)
+controlling device pio
+group PG0
+config 00002809
+config 00000005
+config 00000000
+
+device sdc1
+state default
+type MUX_GROUP (2)
+controlling device pio
+group PG1
+function sdc1
+
+device sdc1
+state default
+type CONFIGS_GROUP (4)
+controlling device pio
+group PG1
+config 00002809
+config 00000005
+config 00000000
+
+device sdc1
+state default
+type MUX_GROUP (2)
+controlling device pio
+group PG2
+function sdc1
+
+device sdc1
+state default
+type CONFIGS_GROUP (4)
+controlling device pio
+group PG2
+config 00002809
+config 00000005
+config 00000000
+
+device sdc1
+state default
+type MUX_GROUP (2)
+controlling device pio
+group PG3
+function sdc1
+
+device sdc1
+state default
+type CONFIGS_GROUP (4)
+controlling device pio
+group PG3
+config 00002809
+config 00000005
+config 00000000
+
+device sdc1
+state default
+type MUX_GROUP (2)
+controlling device pio
+group PG4
+function sdc1
+
+device sdc1
+state default
+type CONFIGS_GROUP (4)
+controlling device pio
+group PG4
+config 00002809
+config 00000005
+config 00000000
+
+device sdc1
+state default
+type MUX_GROUP (2)
+controlling device pio
+group PG5
+function sdc1
+
+device sdc1
+state default
+type CONFIGS_GROUP (4)
+controlling device pio
+group PG5
+config 00002809
+config 00000005
+config 00000000
+
+device sdc1
+state sleep
+type MUX_GROUP (2)
+controlling device pio
+group PG0
+function io_disabled
+
+device sdc1
+state sleep
+type CONFIGS_GROUP (4)
+controlling device pio
+group PG0
+config 00001409
+config 00000005
+
+device sdc1
+state sleep
+type MUX_GROUP (2)
+controlling device pio
+group PG1
+function io_disabled
+
+device sdc1
+state sleep
+type CONFIGS_GROUP (4)
+controlling device pio
+group PG1
+config 00001409
+config 00000005
+
+device sdc1
+state sleep
+type MUX_GROUP (2)
+controlling device pio
+group PG2
+function io_disabled
+
+device sdc1
+state sleep
+type CONFIGS_GROUP (4)
+controlling device pio
+group PG2
+config 00001409
+config 00000005
+
+device sdc1
+state sleep
+type MUX_GROUP (2)
+controlling device pio
+group PG3
+function io_disabled
+
+device sdc1
+state sleep
+type CONFIGS_GROUP (4)
+controlling device pio
+group PG3
+config 00001409
+config 00000005
+
+device sdc1
+state sleep
+type MUX_GROUP (2)
+controlling device pio
+group PG4
+function io_disabled
+
+device sdc1
+state sleep
+type CONFIGS_GROUP (4)
+controlling device pio
+group PG4
+config 00001409
+config 00000005
+
+device sdc1
+state sleep
+type MUX_GROUP (2)
+controlling device pio
+group PG5
+function io_disabled
+
+device sdc1
+state sleep
+type CONFIGS_GROUP (4)
+controlling device pio
+group PG5
+config 00001409
+config 00000005
+
+device daudio2
+state default
+type MUX_GROUP (2)
+controlling device pio
+group PG10
+function i2s2
+
+device daudio2
+state default
+type CONFIGS_GROUP (4)
+controlling device pio
+group PG10
+config 00001409
+config 00000001
+
+device daudio2
+state default
+type MUX_GROUP (2)
+controlling device pio
+group PG11
+function i2s2
+
+device daudio2
+state default
+type CONFIGS_GROUP (4)
+controlling device pio
+group PG11
+config 00001409
+config 00000001
+
+device daudio2
+state default
+type MUX_GROUP (2)
+controlling device pio
+group PG13
+function i2s2
+
+device daudio2
+state default
+type CONFIGS_GROUP (4)
+controlling device pio
+group PG13
+config 00001409
+config 00000001
+
+device daudio2
+state sleep
+type MUX_GROUP (2)
+controlling device pio
+group PG10
+function io_disabled
+
+device daudio2
+state sleep
+type CONFIGS_GROUP (4)
+controlling device pio
+group PG10
+config 00001409
+config 00000001
+
+device daudio2
+state sleep
+type MUX_GROUP (2)
+controlling device pio
+group PG11
+function io_disabled
+
+device daudio2
+state sleep
+type CONFIGS_GROUP (4)
+controlling device pio
+group PG11
+config 00001409
+config 00000001
+
+device daudio2
+state sleep
+type MUX_GROUP (2)
+controlling device pio
+group PG13
+function io_disabled
+
+device daudio2
+state sleep
+type CONFIGS_GROUP (4)
+controlling device pio
+group PG13
+config 00001409
+config 00000001
+
+device rotary_button
+state default
+type MUX_GROUP (2)
+controlling device r_pio
+group PL11
+function gpio_in
+
+device rotary_button
+state default
+type CONFIGS_GROUP (4)
+controlling device r_pio
+group PL11
+config 00000a09
+config 00000005
+
+device vdpo0
+state active
+type MUX_GROUP (2)
+controlling device pio
+group PD1
+function bt1120
+
+device vdpo0
+state active
+type CONFIGS_GROUP (4)
+controlling device pio
+group PD1
+config 00000001
+config 00000000
+config 00000000
+
+device vdpo0
+state active
+type MUX_GROUP (2)
+controlling device pio
+group PD2
+function bt1120
+
+device vdpo0
+state active
+type CONFIGS_GROUP (4)
+controlling device pio
+group PD2
+config 00000001
+config 00000000
+config 00000000
+
+device vdpo0
+state active
+type MUX_GROUP (2)
+controlling device pio
+group PD3
+function bt1120
+
+device vdpo0
+state active
+type CONFIGS_GROUP (4)
+controlling device pio
+group PD3
+config 00000001
+config 00000000
+config 00000000
+
+device vdpo0
+state active
+type MUX_GROUP (2)
+controlling device pio
+group PD4
+function bt1120
+
+device vdpo0
+state active
+type CONFIGS_GROUP (4)
+controlling device pio
+group PD4
+config 00000001
+config 00000000
+config 00000000
+
+device vdpo0
+state active
+type MUX_GROUP (2)
+controlling device pio
+group PD5
+function bt1120
+
+device vdpo0
+state active
+type CONFIGS_GROUP (4)
+controlling device pio
+group PD5
+config 00000001
+config 00000000
+config 00000000
+
+device vdpo0
+state active
+type MUX_GROUP (2)
+controlling device pio
+group PD6
+function bt1120
+
+device vdpo0
+state active
+type CONFIGS_GROUP (4)
+controlling device pio
+group PD6
+config 00000001
+config 00000000
+config 00000000
+
+device vdpo0
+state active
+type MUX_GROUP (2)
+controlling device pio
+group PD7
+function bt1120
+
+device vdpo0
+state active
+type CONFIGS_GROUP (4)
+controlling device pio
+group PD7
+config 00000001
+config 00000000
+config 00000000
+
+device vdpo0
+state active
+type MUX_GROUP (2)
+controlling device pio
+group PD8
+function bt1120
+
+device vdpo0
+state active
+type CONFIGS_GROUP (4)
+controlling device pio
+group PD8
+config 00000001
+config 00000000
+config 00000000
+
+device vdpo0
+state active
+type MUX_GROUP (2)
+controlling device pio
+group PD10
+function bt1120
+
+device vdpo0
+state active
+type CONFIGS_GROUP (4)
+controlling device pio
+group PD10
+config 00000001
+config 00000000
+config 00000000
+
+device vdpo0
+state active
+type MUX_GROUP (2)
+controlling device pio
+group PD11
+function bt1120
+
+device vdpo0
+state active
+type CONFIGS_GROUP (4)
+controlling device pio
+group PD11
+config 00000001
+config 00000000
+config 00000000
+
+device vdpo0
+state active
+type MUX_GROUP (2)
+controlling device pio
+group PD12
+function bt1120
+
+device vdpo0
+state active
+type CONFIGS_GROUP (4)
+controlling device pio
+group PD12
+config 00000001
+config 00000000
+config 00000000
+
+device vdpo0
+state active
+type MUX_GROUP (2)
+controlling device pio
+group PD13
+function bt1120
+
+device vdpo0
+state active
+type CONFIGS_GROUP (4)
+controlling device pio
+group PD13
+config 00000001
+config 00000000
+config 00000000
+
+device vdpo0
+state active
+type MUX_GROUP (2)
+controlling device pio
+group PD14
+function bt1120
+
+device vdpo0
+state active
+type CONFIGS_GROUP (4)
+controlling device pio
+group PD14
+config 00000001
+config 00000000
+config 00000000
+
+device vdpo0
+state active
+type MUX_GROUP (2)
+controlling device pio
+group PD15
+function bt1120
+
+device vdpo0
+state active
+type CONFIGS_GROUP (4)
+controlling device pio
+group PD15
+config 00000001
+config 00000000
+config 00000000
+
+device vdpo0
+state active
+type MUX_GROUP (2)
+controlling device pio
+group PD16
+function bt1120
+
+device vdpo0
+state active
+type CONFIGS_GROUP (4)
+controlling device pio
+group PD16
+config 00000001
+config 00000000
+config 00000000
+
+device vdpo0
+state active
+type MUX_GROUP (2)
+controlling device pio
+group PD17
+function bt1120
+
+device vdpo0
+state active
+type CONFIGS_GROUP (4)
+controlling device pio
+group PD17
+config 00000001
+config 00000000
+config 00000000
+
+device vdpo0
+state active
+type MUX_GROUP (2)
+controlling device pio
+group PD18
+function bt1120
+
+device vdpo0
+state active
+type CONFIGS_GROUP (4)
+controlling device pio
+group PD18
+config 00000001
+config 00000000
+config 00000000
+
+device vdpo0
+state active
+type MUX_GROUP (2)
+controlling device pio
+group PD19
+function bt1120
+
+device vdpo0
+state active
+type CONFIGS_GROUP (4)
+controlling device pio
+group PD19
+config 00000001
+config 00000000
+config 00000000
+
+device vdpo0
+state active
+type MUX_GROUP (2)
+controlling device pio
+group PD20
+function bt1120
+
+device vdpo0
+state active
+type CONFIGS_GROUP (4)
+controlling device pio
+group PD20
+config 00000001
+config 00000000
+config 00000000
+
+device vdpo0
+state active
+type MUX_GROUP (2)
+controlling device pio
+group PD21
+function bt1120
+
+device vdpo0
+state active
+type CONFIGS_GROUP (4)
+controlling device pio
+group PD21
+config 00000001
+config 00000000
+config 00000000
+
+device vdpo0
+state sleep
+type MUX_GROUP (2)
+controlling device pio
+group PD1
+function io_disabled
+
+device vdpo0
+state sleep
+type CONFIGS_GROUP (4)
+controlling device pio
+group PD1
+config 00000001
+config 00000000
+config 00000000
+
+device vdpo0
+state sleep
+type MUX_GROUP (2)
+controlling device pio
+group PD2
+function io_disabled
+
+device vdpo0
+state sleep
+type CONFIGS_GROUP (4)
+controlling device pio
+group PD2
+config 00000001
+config 00000000
+config 00000000
+
+device vdpo0
+state sleep
+type MUX_GROUP (2)
+controlling device pio
+group PD3
+function io_disabled
+
+device vdpo0
+state sleep
+type CONFIGS_GROUP (4)
+controlling device pio
+group PD3
+config 00000001
+config 00000000
+config 00000000
+
+device vdpo0
+state sleep
+type MUX_GROUP (2)
+controlling device pio
+group PD4
+function io_disabled
+
+device vdpo0
+state sleep
+type CONFIGS_GROUP (4)
+controlling device pio
+group PD4
+config 00000001
+config 00000000
+config 00000000
+
+device vdpo0
+state sleep
+type MUX_GROUP (2)
+controlling device pio
+group PD5
+function io_disabled
+
+device vdpo0
+state sleep
+type CONFIGS_GROUP (4)
+controlling device pio
+group PD5
+config 00000001
+config 00000000
+config 00000000
+
+device vdpo0
+state sleep
+type MUX_GROUP (2)
+controlling device pio
+group PD6
+function io_disabled
+
+device vdpo0
+state sleep
+type CONFIGS_GROUP (4)
+controlling device pio
+group PD6
+config 00000001
+config 00000000
+config 00000000
+
+device vdpo0
+state sleep
+type MUX_GROUP (2)
+controlling device pio
+group PD7
+function io_disabled
+
+device vdpo0
+state sleep
+type CONFIGS_GROUP (4)
+controlling device pio
+group PD7
+config 00000001
+config 00000000
+config 00000000
+
+device vdpo0
+state sleep
+type MUX_GROUP (2)
+controlling device pio
+group PD8
+function io_disabled
+
+device vdpo0
+state sleep
+type CONFIGS_GROUP (4)
+controlling device pio
+group PD8
+config 00000001
+config 00000000
+config 00000000
+
+device vdpo0
+state sleep
+type MUX_GROUP (2)
+controlling device pio
+group PD10
+function io_disabled
+
+device vdpo0
+state sleep
+type CONFIGS_GROUP (4)
+controlling device pio
+group PD10
+config 00000001
+config 00000000
+config 00000000
+
+device vdpo0
+state sleep
+type MUX_GROUP (2)
+controlling device pio
+group PD11
+function io_disabled
+
+device vdpo0
+state sleep
+type CONFIGS_GROUP (4)
+controlling device pio
+group PD11
+config 00000001
+config 00000000
+config 00000000
+
+device vdpo0
+state sleep
+type MUX_GROUP (2)
+controlling device pio
+group PD12
+function io_disabled
+
+device vdpo0
+state sleep
+type CONFIGS_GROUP (4)
+controlling device pio
+group PD12
+config 00000001
+config 00000000
+config 00000000
+
+device vdpo0
+state sleep
+type MUX_GROUP (2)
+controlling device pio
+group PD13
+function io_disabled
+
+device vdpo0
+state sleep
+type CONFIGS_GROUP (4)
+controlling device pio
+group PD13
+config 00000001
+config 00000000
+config 00000000
+
+device vdpo0
+state sleep
+type MUX_GROUP (2)
+controlling device pio
+group PD14
+function io_disabled
+
+device vdpo0
+state sleep
+type CONFIGS_GROUP (4)
+controlling device pio
+group PD14
+config 00000001
+config 00000000
+config 00000000
+
+device vdpo0
+state sleep
+type MUX_GROUP (2)
+controlling device pio
+group PD15
+function io_disabled
+
+device vdpo0
+state sleep
+type CONFIGS_GROUP (4)
+controlling device pio
+group PD15
+config 00000001
+config 00000000
+config 00000000
+
+device vdpo0
+state sleep
+type MUX_GROUP (2)
+controlling device pio
+group PD16
+function io_disabled
+
+device vdpo0
+state sleep
+type CONFIGS_GROUP (4)
+controlling device pio
+group PD16
+config 00000001
+config 00000000
+config 00000000
+
+device vdpo0
+state sleep
+type MUX_GROUP (2)
+controlling device pio
+group PD17
+function io_disabled
+
+device vdpo0
+state sleep
+type CONFIGS_GROUP (4)
+controlling device pio
+group PD17
+config 00000001
+config 00000000
+config 00000000
+
+device vdpo0
+state sleep
+type MUX_GROUP (2)
+controlling device pio
+group PD18
+function io_disabled
+
+device vdpo0
+state sleep
+type CONFIGS_GROUP (4)
+controlling device pio
+group PD18
+config 00000001
+config 00000000
+config 00000000
+
+device vdpo0
+state sleep
+type MUX_GROUP (2)
+controlling device pio
+group PD19
+function io_disabled
+
+device vdpo0
+state sleep
+type CONFIGS_GROUP (4)
+controlling device pio
+group PD19
+config 00000001
+config 00000000
+config 00000000
+
+device vdpo0
+state sleep
+type MUX_GROUP (2)
+controlling device pio
+group PD20
+function io_disabled
+
+device vdpo0
+state sleep
+type CONFIGS_GROUP (4)
+controlling device pio
+group PD20
+config 00000001
+config 00000000
+config 00000000
+
+device vdpo0
+state sleep
+type MUX_GROUP (2)
+controlling device pio
+group PD21
+function io_disabled
+
+device vdpo0
+state sleep
+type CONFIGS_GROUP (4)
+controlling device pio
+group PD21
+config 00000001
+config 00000000
+config 00000000
+
+

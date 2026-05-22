@@ -1,0 +1,21 @@
+gpiochip1: GPIOs 0-287, parent: platform/pio, pio:
+ gpio-128 (                    |sysfs               ) out lo    
+ gpio-129 (                    |sysfs               ) out lo    
+ gpio-131 (                    |sysfs               ) out lo    
+ gpio-132 (                    |sysfs               ) out hi    
+ gpio-141 (                    |?                   ) out hi    
+ gpio-142 (                    |?                   ) in  hi    
+ gpio-166 (                    |cd                  ) in  lo    
+ gpio-200 (                    |wlan_regon          ) out hi    
+ gpio-201 (                    |wlan_hostwake       ) in  hi    
+ gpio-204 (                    |Speaker             ) out lo    
+ gpio-224 (                    |sysfs               ) out hi    
+ gpio-228 (                    |sysfs               ) out lo    
+ gpio-258 (                    |sysfs               ) out lo    
+
+gpiochip0: GPIOs 352-383, parent: platform/r_pio, r_pio:
+ gpio-356 (                    |card-pwr-gpios      ) out lo    
+ gpio-363 (                    |ENTER               ) in  hi    
+ gpio-364 (                    |rotary_axis         ) in  lo    
+ gpio-365 (                    |rotary_axis         ) in  lo    
+

@@ -1,0 +1,17 @@
+Pinmux settings per pin
+Format: pin (name): mux_owner gpio_owner hog?
+pin 352 (PL0): (MUX UNCLAIMED) (GPIO UNCLAIMED)
+pin 353 (PL1): (MUX UNCLAIMED) (GPIO UNCLAIMED)
+pin 354 (PL2): (MUX UNCLAIMED) (GPIO UNCLAIMED)
+pin 355 (PL3): (MUX UNCLAIMED) (GPIO UNCLAIMED)
+pin 356 (PL4): (MUX UNCLAIMED) r_pio:356
+pin 357 (PL5): (MUX UNCLAIMED) (GPIO UNCLAIMED)
+pin 358 (PL6): (MUX UNCLAIMED) (GPIO UNCLAIMED)
+pin 359 (PL7): (MUX UNCLAIMED) (GPIO UNCLAIMED)
+pin 360 (PL8): (MUX UNCLAIMED) (GPIO UNCLAIMED)
+pin 361 (PL9): (MUX UNCLAIMED) (GPIO UNCLAIMED)
+pin 362 (PL10): (MUX UNCLAIMED) (GPIO UNCLAIMED)
+pin 363 (PL11): rotary_button r_pio:363 function gpio_in group PL11
+pin 364 (PL12): rotary_axis r_pio:364 function gpio_in group PL12
+pin 365 (PL13): rotary_axis r_pio:365 function gpio_in group PL13
+

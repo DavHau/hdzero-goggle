@@ -1,0 +1,40 @@
+           CPU0       CPU1       
+ 17:        551      12697  wakeupgen  60 Level     sun4i_timer0
+ 18:          0          0     GIC-0  29 Level     arch_timer
+ 19:     789793     815726     GIC-0  30 Level     arch_timer
+ 34:          1          0  sunxi_pio_edge  11 Edge      ENTER
+ 35:          0          0  sunxi_pio_edge  12 Edge      rotary-encoder
+ 36:          0          0  sunxi_pio_edge  13 Edge      rotary-encoder
+286:          3          0  wakeupgen  10 Level     3002000.dma-controller
+292:          0          0  wakeupgen 107 Level     rtc
+294:          0          0  wakeupgen  25 Level     cedar_dev
+295:          0          0  wakeupgen  24 Level     sunxi_ise
+296:          0          0  wakeupgen  26 Level     sunxi_eise
+297:        454          0  wakeupgen  49 Level     uart0
+298:      54317          0  wakeupgen  50 Level     uart1
+299:      53855          0  wakeupgen  51 Level     uart2
+302:    5614056          0  wakeupgen  42 Level     twi1
+303:    6744622          0  wakeupgen  43 Level     twi2
+304:     203646          0  wakeupgen  44 Level     twi3
+305:          0          0  wakeupgen  64 Level     sunxi_usb_udc
+309:          2          0  wakeupgen  54 Level     spi0
+310:         10          0  wakeupgen  55 Level     spi1
+311:          3          0  wakeupgen  57 Level     spi3
+312:      17740          0  wakeupgen  46 Level     sunxi-mmc0
+313:         50          0  wakeupgen  47 Level     sunxi-mmc1
+314:      64967          0  wakeupgen  62 Level     dispaly
+319:          0          0  wakeupgen  21 Level     1480000.g2d
+322:          0          0  wakeupgen  33 Level     2100000.isp
+323:          0          0  wakeupgen  74 Level     vinc0
+324:          0          0  wakeupgen  75 Level     vinc1
+325:          0          0  wakeupgen  35 Edge      ss
+328:          0          0  wakeupgen 104 Level     axp2101_irq_chip
+IPI0:          0          0  CPU wakeup interrupts
+IPI1:         14         50  Timer broadcast interrupts
+IPI2:     675716    1937664  Rescheduling interrupts
+IPI3:          2         10  Function call interrupts
+IPI4:          0          0  CPU stop interrupts
+IPI5:        340        319  IRQ work interrupts
+IPI6:          0          0  completion interrupts
+Err:          0
+
