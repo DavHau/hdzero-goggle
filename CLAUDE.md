@@ -3,8 +3,8 @@
 Custom firmware for the HDZero FPV goggles (Allwinner sun8iw16p1 / armv7l,
 kernel 4.9.118), built with Nix. The closed-source vendor kernel modules are
 reimplemented in `src/kmod/`; remaining blobs: `libota-burnboot.so`
-(userspace) and the prebuilt `rotary_encoder.ko`/`mcp3021.ko`, whose source
-exists in the kernel tree.
+(userspace) and `mcp3021.ko` (vendor IIO driver, unused on this hardware,
+the battery voltage comes from the SoC ADC).
 
 ## Reimplemented vendor kernel modules
 
@@ -33,9 +33,9 @@ References:
 ## How modules end up in the image
 
 - `nix/kernel-modules.nix` = in-tree modules from the nix kernel +
-  `hdzero-kmods` + the remaining `rotary_encoder.ko` blob, loaded via
-  `boot.kernelModules` (hdzero must come before vin_v4l2, which registers
-  sensors at probe) and the `hdzero` service preStart.
+  `hdzero-kmods`, loaded via `boot.kernelModules` (hdzero must come before
+  vin_v4l2, which registers sensors at probe) and the `hdzero` service
+  preStart. rotary_encoder is built into the kernel (CONFIG_ROTARY_ENCODER).
 - Remaining blobs ship inside `app.ext2` (`nix/goggle-app-nix/`); the
   `hdzero` service still insmods `/mnt/app/ko/mcp3021.ko` from there.
 - `nix/sdcard/default.nix` assembles the image (u-boot, uImage, dtb,

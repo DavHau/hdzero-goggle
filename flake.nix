@@ -100,7 +100,6 @@
         # /lib/modules content: in-tree modules + hdzero-kmods + the
         # remaining rotary_encoder blob
         kernel-modules = pkgs.callPackage ./nix/kernel-modules.nix {
-          inherit hdzero-goggle-src nix-filter;
           inherit (self.packages.${system}) kernel hdzero-kmods;
         };
 

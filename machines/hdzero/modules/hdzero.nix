@@ -19,7 +19,6 @@
     "hdzero"
     "vin_v4l2"
     "sunxi-wlan"
-    "gpio_keys"
     "gpio_keys_hdzero"
   ];
   systemd.services.hdzero = {

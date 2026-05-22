@@ -69,3 +69,6 @@ CONFIG_IKCONFIG_PROC=y
 
 # increase dmesg buffer size
 CONFIG_LOG_BUF_SHIFT=18
+
+# rotary wheel (DT node rotary_axis), replaces the prebuilt rotary_encoder.ko
+CONFIG_ROTARY_ENCODER=y
