@@ -204,6 +204,10 @@
           # inherit (self.packages.${system}) toolchain;
         };
 
+        # cross dev shell for building a mainline kernel for the V536 port:
+        # `nix develop .#kernel-mainline`
+        kernel-mainline = pkgsArm.callPackage ./nix/devShell-kernel-mainline.nix { };
+
         # cross dev shell for building the vendor kernel / modules in a local
         # kernel checkout: `nix develop .#kernel`
         kernel =
