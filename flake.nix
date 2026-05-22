@@ -97,11 +97,20 @@
             ;
         };
 
-        # hdzero binary kernel modules for which we do not have the source
+        # /lib/modules content: in-tree modules + hdzero-kmods + the
+        # remaining rotary_encoder blob
         kernel-modules = pkgs.callPackage ./nix/kernel-modules.nix {
-          inherit hdzero-goggle-src nix-filter;
-          inherit (self.packages.${system}) kernel;
+          inherit (self.packages.${system}) kernel hdzero-kmods;
         };
+
+        # reimplemented vendor kernel modules (src/kmod)
+        hdzero-kmods =
+          nixpkgs_22_05.legacyPackages.${system}.pkgsCross.armv7l-hf-multiplatform.callPackage
+            ./nix/hdzero-kmods
+            {
+              inherit hdzero-goggle-src hdzero-goggle-linux-src;
+              inherit (self.packages.${system}) kernel;
+            };
 
         # the kernel built with nix
         kernel =
@@ -190,8 +199,19 @@
       checks.${system} = self.packages.${system};
 
       # a dev environment which can be entered via `nix develop .`
-      devShells.${system}.default = pkgs.callPackage ./nix/devShell.nix {
-        # inherit (self.packages.${system}) toolchain;
+      devShells.${system} = {
+        default = pkgs.callPackage ./nix/devShell.nix {
+          # inherit (self.packages.${system}) toolchain;
+        };
+
+        # cross dev shell for building the vendor kernel / modules in a local
+        # kernel checkout: `nix develop .#kernel`
+        kernel =
+          nixpkgs_22_05.legacyPackages.${system}.pkgsCross.armv7l-hf-multiplatform.callPackage
+            ./nix/devShell-kernel.nix
+            {
+              inherit (self.packages.${system}) kernel;
+            };
       };
 
       # the nixos configuration for the nixos based version of the goggle os

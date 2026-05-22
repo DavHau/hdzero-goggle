@@ -15,14 +15,19 @@
     "vin_io"
     "tp9950"
     "imx415_mipi"
+    # sensor modules must be loaded before vin_v4l2, it registers them at probe
+    "hdzero"
     "vin_v4l2"
     "sunxi-wlan"
-    "gpio_keys"
+    "gpio_keys_hdzero"
   ];
   systemd.services.hdzero = {
     description = "hdzero goggle app";
     wantedBy = [ "multi-user.target" ];
     before = [ "systemd-sysctl.service" ];
+    # the app needs the vin/v4l2 modules from boot.kernelModules
+    after = [ "systemd-modules-load.service" ];
+    wants = [ "systemd-modules-load.service" ];
     unitConfig.DefaultDependencies = false;
     serviceConfig = {
       Restart = "always";
@@ -34,8 +39,6 @@
       packages.hdzero-scripts
     ];
     preStart = ''
-      insmod /mnt/app/ko/hdzero.ko || :
-      usleep 200000
       echo 0x0300B098 0x00775577 > /sys/class/sunxi_dump/write
       echo 0x0300B0D8 0x22777777 > /sys/class/sunxi_dump/write
       echo 0x0300B0fc 0x35517751 > /sys/class/sunxi_dump/write  # fans to max
@@ -46,7 +49,7 @@
       sleep 1
       insmod /mnt/app/ko/mcp3021.ko || :
       usleep 2000
-      insmod /mnt/app/ko/nct75.ko || :
+      insmod ${packages.kernel-modules}/lib/modules/${packages.kernel.modDirVersion}/nct75.ko || :
       usleep 2000
 
       # set Microphone Bias Control Register
