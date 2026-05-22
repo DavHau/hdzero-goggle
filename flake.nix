@@ -97,11 +97,21 @@
             ;
         };
 
-        # hdzero binary kernel modules for which we do not have the source
+        # /lib/modules content: in-tree modules + hdzero-kmods + the
+        # remaining rotary_encoder blob
         kernel-modules = pkgs.callPackage ./nix/kernel-modules.nix {
           inherit hdzero-goggle-src nix-filter;
-          inherit (self.packages.${system}) kernel;
+          inherit (self.packages.${system}) kernel hdzero-kmods;
         };
+
+        # reimplemented vendor kernel modules (src/kmod)
+        hdzero-kmods =
+          nixpkgs_22_05.legacyPackages.${system}.pkgsCross.armv7l-hf-multiplatform.callPackage
+            ./nix/hdzero-kmods
+            {
+              inherit hdzero-goggle-src hdzero-goggle-linux-src;
+              inherit (self.packages.${system}) kernel;
+            };
 
         # the kernel built with nix
         kernel =

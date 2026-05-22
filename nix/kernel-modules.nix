@@ -6,6 +6,7 @@
 
   # from this project
   hdzero-goggle-src,
+  hdzero-kmods,
   kernel,
 }:
 let
@@ -18,7 +19,8 @@ runCommand "kernel-modules" {} ''
   mkdir -p $installDir
   cp -r ${kernel}/lib/modules/${kernel.modDirVersion}/* $installDir
   chmod +w -R $installDir
+  cp ${koDir}/rotary_encoder.ko $installDir/
   cp \
-    ${koDir}/{gpio_keys_hdzero,hdzero,rotary_encoder}.ko \
+    ${hdzero-kmods}/lib/modules/${kernel.modDirVersion}/extra/*/*.ko \
     $installDir/
 ''

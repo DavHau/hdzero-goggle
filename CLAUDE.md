@@ -4,17 +4,25 @@ Custom firmware for the HDZero FPV goggles (Allwinner sun8iw16p1 / armv7l,
 kernel 4.9.118), built with Nix. Goal: re-implement the closed-source vendor
 kernel modules.
 
-## Closed-source kernel modules to re-implement
+## Reimplemented vendor kernel modules
 
 All `.ko` in `mkapp/app/ko/` are prebuilt vendor blobs; most have source in
-the kernel fork. These do NOT:
+the kernel fork. The four without source are reimplemented in `src/kmod/`
+(verified on hardware against the blobs, except w25q128 which targets our
+kernel only — the stock kernel uses a newer spi-nor API):
 
-| Blob                  | What it is                                              | Closest upstream base                |
-|-----------------------|----------------------------------------------------------|--------------------------------------|
-| `hdzero.ko`           | Divimath HDZero sensor driver (i2c, depends on `vin_io`) | none, reverse engineer               |
-| `gpio_keys_hdzero.ko` | Modified gpio_keys, OF compatible `gpio-keys-hdzero`     | `drivers/input/keyboard/gpio_keys.c` |
-| `nct75.ko`            | NCT75 temperature sensor (lm75 derivative)               | `drivers/hwmon/lm75.c`               |
-| `w25q128.ko`          | SPI NOR flash for the FPGA (m25p80 derivative)           | `drivers/mtd/devices/m25p80.c`       |
+| Blob                  | What it is                                                | Replacement                  |
+|-----------------------|------------------------------------------------------------|------------------------------|
+| `hdzero.ko`           | sunxi-vin sensor driver for the HDZero baseband (BT.1120)  | `src/kmod/hdzero/`           |
+| `gpio_keys_hdzero.ko` | gpio_keys renamed to OF compatible `gpio-keys-hdzero`      | `src/kmod/gpio_keys_hdzero/` |
+| `nct75.ko`            | NCT75 temperature sensor as IIO "voltage" channels         | `src/kmod/nct75/`            |
+| `w25q128.ko`          | m25p80 trimmed to Winbond parts (FPGA SPI NOR)             | `src/kmod/w25q128/`          |
+
+Still closed: `libota-burnboot.so` (userspace).
+
+They are built as `packages.hdzero-kmods` (out-of-tree against the nix
+kernel) and land in the image via `nix/kernel-modules.nix` and the `hdzero`
+service (`machines/hdzero/modules/hdzero.nix`).
 
 References:
 - `~/git/linux`: local checkout of the 4.9.118 vendor kernel (same rev as
@@ -24,15 +32,13 @@ References:
 
 ## How modules end up in the image
 
-- Blobs ship inside `app.ext2` (`nix/goggle-app-nix/`); the `hdzero` service
-  (`machines/hdzero/modules/hdzero.nix`) insmods `/mnt/app/ko/*.ko` at boot.
-- `nix/kernel-modules.nix` adds `gpio_keys_hdzero/hdzero/rotary_encoder.ko`
-  blobs to the nix-built `lib/modules`, loaded via `boot.kernelModules`.
+- `nix/kernel-modules.nix` = in-tree modules from the nix kernel +
+  `hdzero-kmods` + the remaining `rotary_encoder.ko` blob, loaded via
+  `boot.kernelModules` and the `hdzero` service preStart.
+- Remaining blobs ship inside `app.ext2` (`nix/goggle-app-nix/`); the
+  `hdzero` service still insmods `/mnt/app/ko/mcp3021.ko` from there.
 - `nix/sdcard/default.nix` assembles the image (u-boot, uImage, dtb,
   rootfs.ext2, app.ext2).
-
-To replace a blob: wire the new module into `nix/kernel-modules.nix` /
-`boot.kernelModules` and drop the blob from the copy list.
 
 ## Building
 
