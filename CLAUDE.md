@@ -2,9 +2,10 @@
 
 Custom firmware for the HDZero FPV goggles (Allwinner sun8iw16p1 / armv7l,
 kernel 4.9.118), built with Nix. The closed-source vendor kernel modules are
-reimplemented in `src/kmod/`; remaining blobs: `libota-burnboot.so`
-(userspace) and `mcp3021.ko` (vendor IIO driver, unused on this hardware,
-the battery voltage comes from the SoC ADC).
+reimplemented in `src/kmod/`; remaining kernel blob: `mcp3021.ko` (vendor
+IIO driver, unused on this hardware, the battery voltage comes from the SoC
+ADC). The Allwinner userspace media stack in `lib/softwinner/` is still
+prebuilt.
 
 ## Reimplemented vendor kernel modules
 
