@@ -1,0 +1,7 @@
+affected_cpus               related_cpus                   scaling_governor
+cpuinfo_cur_freq            scaling_available_frequencies  scaling_max_freq
+cpuinfo_max_freq            scaling_available_governors    scaling_min_freq
+cpuinfo_min_freq            scaling_cur_freq               scaling_setspeed
+cpuinfo_transition_latency  scaling_driver                 stats
+600000 816000 912000 1008000 1104000 
+

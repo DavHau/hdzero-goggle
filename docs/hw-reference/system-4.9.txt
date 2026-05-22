@@ -1,0 +1,45 @@
+processor	: 0
+model name	: ARMv7 Processor rev 5 (v7l)
+BogoMIPS	: 42.94
+Features	: half thumb fastmult vfp edsp neon vfpv3 tls vfpv4 idiva idivt vfpd32 lpae 
+CPU implementer	: 0x41
+CPU architecture: 7
+CPU variant	: 0x0
+CPU part	: 0xc07
+CPU revision	: 5
+
+processor	: 1
+model name	: ARMv7 Processor rev 5 (v7l)
+BogoMIPS	: 42.94
+Features	: half thumb fastmult vfp edsp neon vfpv3 tls vfpv4 idiva idivt vfpd32 lpae 
+CPU implementer	: 0x41
+CPU architecture: 7
+CPU variant	: 0x0
+CPU part	: 0xc07
+CPU revision	: 5
+
+Hardware	: sun8iw16
+Revision	: 0000
+Serial		: 0000000000000000
+===
+earlycon=uart,mmio32,0x05000000 initcall_debug=0 console=ttyS0,115200 loglevel=8 root=/dev/mmcblk0p2 init=/init partitions=env@mmcblk0p2:boot@mmcblk0p5:rootfs@mmcblk0p6:app@mmcblk0p7:UDISK@mmcblk0p1 cma=32M ion_carveout_list=512M@1024M rootwait
+
+===
+Module                  Size  Used by
+xradio_wlan            80882  0
+nct75                   1389  0
+mcp3021                 1607  0
+vdpo                    9899  0
+disp                  285699  2 vdpo
+sunxi_wlan              7445  1 xradio_wlan
+vin_v4l2              111486  2
+hdzero                  3454  0
+imx415_mipi             6598  0
+tp9950                  8524  0
+vin_io                 24295  4 vin_v4l2,imx415_mipi,tp9950,hdzero
+videobuf2_dma_contig     5939  1 vin_v4l2
+sunxi_ise               5846  0
+sunxi_eise              5929  0
+gpio_keys_hdzero        6143  0
+w25q128                 2663  0
+

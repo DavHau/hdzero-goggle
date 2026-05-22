@@ -29,3 +29,6 @@ consequence, not as the root cause.
   clock 100 MHz from pll_periph1x2; controller at 0x04020000, irq 46.
 - CCU at 0x03001000, PRCM at 0x07010000, pio at 0x0300b000,
   r_pio at 0x07022000, uart0 at 0x05000000.
+- PMIC is an AXP2101 (regulator/charger, see regulators-4.9.txt); cpufreq
+  OPPs 600-1104 MHz on dcdc2. Not needed for the first boot milestone,
+  but check mainline AXP2101 support before touching cpufreq/charging.

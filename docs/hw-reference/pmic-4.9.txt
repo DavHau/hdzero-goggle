@@ -1,0 +1,22 @@
+/sys/class/axp/axp_name:axp2101
+/sys/class/axp/axp_num:pmu0
+/sys/class/axp/axp_reg:axp2101:REG[0x0]=0x20
+/sys/class/axp/axp_regs:axp2101:REG[0x0]=0x20
+/sys/class/axp/axp_regs:axp2101:REG[0x1]=0x15
+/sys/class/axp/debug_mask:1: SPLY 2: REGU 4: INT 8: CHG
+/sys/class/axp/debug_mask:debug_mask=0
+/sys/class/axp/sys_pwr_get:0x0
+/sys/bus/platform/drivers/axp2101:
+bind  pmu0  uevent  unbind
+
+/sys/bus/platform/drivers/axp2101-powerkey:
+bind  uevent  unbind
+
+/sys/bus/platform/drivers/axp2101-regulator:
+axp2101-regulator  bind  uevent  unbind
+[    0.542763] [axp2101] chip id detect 0x4a !
+[    0.542896] [axp2101] enable dcdc2 dvm.
+[    2.211629] axp2101 powerkey device tree err!
+[    2.216547] axp2101-powerkey: probe of axp2101-powerkey failed with error -16
+[    3.193953] axp2101_dcdc2: incomplete constraints, leaving on
+

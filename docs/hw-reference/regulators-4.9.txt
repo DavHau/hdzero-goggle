@@ -1,0 +1,33 @@
+ regulator                      use open bypass voltage current     min     max
+-------------------------------------------------------------------------------
+ regulator-dummy                  0    0      0     0mV     0mA     0mV     0mV 
+ axp2101_dcdc1                    7    9      0  3300mV     0mA  1500mV  3400mV 
+    deviceless                                                      0mV     0mV
+    deviceless                                                      0mV     0mV
+    deviceless                                                      0mV     0mV
+    deviceless                                                      0mV     0mV
+    deviceless                                                      0mV     0mV
+    deviceless                                                      0mV     0mV
+    deviceless                                                      0mV     0mV
+    deviceless                                                      0mV     0mV
+    deviceless                                                      0mV     0mV
+ axp2101_dcdc2                    0    1      0   820mV     0mA   500mV  1540mV 
+    cpu0                                                            0mV     0mV
+ axp2101_dcdc3                    0    0      0   920mV     0mA   500mV  1540mV 
+ axp2101_dcdc4                    0    0      0  1360mV     0mA   500mV  1840mV 
+ axp2101_rtc                      0    0      0  3000mV     0mA  3000mV  3000mV 
+ axp2101_rtc1                     0    0      0  3000mV     0mA  3000mV  3000mV 
+ axp2101_aldo1                    1    1      0  1800mV     0mA   500mV  3500mV 
+    deviceless                                                      0mV     0mV
+ axp2101_aldo2                    0    0      0  1800mV     0mA   500mV  3500mV 
+ axp2101_aldo3                    0    0      0  3300mV     0mA   500mV  3500mV 
+ axp2101_aldo4                    0    0      0  3300mV     0mA   500mV  3400mV 
+ axp2101_bldo1                    2    2      0  1800mV     0mA   500mV  3500mV 
+    deviceless                                                      0mV     0mV
+    deviceless                                                      0mV     0mV
+ axp2101_bldo2                    0    0      0  3300mV     0mA   500mV  3500mV 
+ axp2101_cpuldos                  0    0      0   900mV     0mA   500mV  1400mV 
+ axp2101_dldo1                    0    0      0   500mV     0mA   500mV  3500mV 
+ axp2101_dldo2                    0    0      0  1200mV     0mA   500mV  1400mV 
+ axp2101_dcdc5                    0    0      0  3700mV     0mA  1400mV  3700mV 
+

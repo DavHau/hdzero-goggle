@@ -1,0 +1,7 @@
+/sys/bus/i2c/devices/1-0048 nct75
+/sys/bus/i2c/devices/2-0048 nct75
+/sys/bus/i2c/devices/3-0048 nct75
+/sys/bus/i2c/devices/i2c-1 twi1
+/sys/bus/i2c/devices/i2c-2 twi2
+/sys/bus/i2c/devices/i2c-3 twi3
+
