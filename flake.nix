@@ -190,8 +190,19 @@
       checks.${system} = self.packages.${system};
 
       # a dev environment which can be entered via `nix develop .`
-      devShells.${system}.default = pkgs.callPackage ./nix/devShell.nix {
-        # inherit (self.packages.${system}) toolchain;
+      devShells.${system} = {
+        default = pkgs.callPackage ./nix/devShell.nix {
+          # inherit (self.packages.${system}) toolchain;
+        };
+
+        # cross dev shell for building the vendor kernel / modules in a local
+        # kernel checkout: `nix develop .#kernel`
+        kernel =
+          nixpkgs_22_05.legacyPackages.${system}.pkgsCross.armv7l-hf-multiplatform.callPackage
+            ./nix/devShell-kernel.nix
+            {
+              inherit (self.packages.${system}) kernel;
+            };
       };
 
       # the nixos configuration for the nixos based version of the goggle os
