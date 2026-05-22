@@ -1,6 +1,21 @@
 # Mainline kernel port (Allwinner V536 / sun8iw16p1)
 
-Status: research. Mainline has no V536 SoC support — only fallback
+Status: drivers written, untested on hardware. The port lives on the
+`v536-port` branch of https://github.com/Mic92/linux (based on stable
+v7.0.9, 25 patches): machine support, PIO/R-PIO pinctrl, CCU + PRCM
+(sunxi-ng), DMA, SID efuse, thermal sensor + throttling, RTC (provides
+LOSC/IOSC), USB (phy + MUSB peripheral mode), AXP2101 PMIC (mfd +
+regulators), cpufreq (OPP 600-1104 MHz, DCDC2 supply), GPADC (RSSI input,
+not battery), and a devicetree with uart0, mmc0/1, i2c0-3 + R_I2C, spi0
+(FPGA flash), watchdog. Everything is compile-tested only; an adversarial
+review round against the BSP sources and the hardware register dumps fixed
+the known bugs (MMC clock gate, watchdog IRQ, i2c3 pins, MUSB endpoints).
+Build with
+`nix develop .#kernel-mainline` + `scripts/build-mainline-uimage.sh`
+(KERNEL_DIR points to a local checkout of that branch), boot via the
+vendor u-boot (`loady` + `bootm`, or repack the SD image).
+
+Previous findings: Mainline has no V536 SoC support — only fallback
 compatibles for individual IP blocks ("allwinner,sun8i-v536-i2c",
 "...-mbus" referenced by H616/A100/D1). The earlier 6.12 boot attempt
 stalled because pinctrl waits for the "pio"/"cpurpio" clocks and nothing
@@ -16,7 +31,13 @@ consequence, not as the root cause.
    `drivers/pinctrl/sunxi/pinctrl-sun8iw16p1{,-r}.c` (mechanical).
 4. `sun8i-v536.dtsi` + hdzero goggle board dts. Minimal first target:
    uart0 console, mmc0 rootfs, gic, timers.
-5. Everything else (display/VDPO, CSI/ISP, video engine, audio) is
+5. Still missing / open questions: SoC PWM driver (new multi-channel IP,
+   no mainline match - but the goggle does not use it, the fan is on I2C
+   0x64 / DM5680), audio codec, battery readout (external MCP3021 on I2C,
+   not the SoC GPADC), AXP2101 power-key IRQ polarity (vendor uses GIC SPI
+   104 level, needs hardware test), thermal calibration (efuse not burned),
+   config slimming, nix packaging, hardware boot test.
+6. Everything else (display/VDPO, CSI/ISP, video engine) is
    vendor-specific and a separate, much larger effort.
 
 ## Reference data
