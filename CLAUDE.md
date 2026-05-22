@@ -1,8 +1,10 @@
 # HDZero Goggle
 
 Custom firmware for the HDZero FPV goggles (Allwinner sun8iw16p1 / armv7l,
-kernel 4.9.118), built with Nix. Goal: re-implement the closed-source vendor
-kernel modules.
+kernel 4.9.118), built with Nix. The closed-source vendor kernel modules are
+reimplemented in `src/kmod/`; remaining blobs: `libota-burnboot.so`
+(userspace) and the prebuilt `rotary_encoder.ko`/`mcp3021.ko`, whose source
+exists in the kernel tree.
 
 ## Reimplemented vendor kernel modules
 
@@ -18,8 +20,6 @@ kernel only — the stock kernel uses a newer spi-nor API):
 | `nct75.ko`            | NCT75 temperature sensor as IIO "voltage" channels         | `src/kmod/nct75/`            |
 | `w25q128.ko`          | m25p80 trimmed to Winbond parts (FPGA SPI NOR)             | `src/kmod/w25q128/`          |
 
-Still closed: `libota-burnboot.so` (userspace).
-
 They are built as `packages.hdzero-kmods` (out-of-tree against the nix
 kernel) and land in the image via `nix/kernel-modules.nix` and the `hdzero`
 service (`machines/hdzero/modules/hdzero.nix`).
@@ -34,7 +34,8 @@ References:
 
 - `nix/kernel-modules.nix` = in-tree modules from the nix kernel +
   `hdzero-kmods` + the remaining `rotary_encoder.ko` blob, loaded via
-  `boot.kernelModules` and the `hdzero` service preStart.
+  `boot.kernelModules` (hdzero must come before vin_v4l2, which registers
+  sensors at probe) and the `hdzero` service preStart.
 - Remaining blobs ship inside `app.ext2` (`nix/goggle-app-nix/`); the
   `hdzero` service still insmods `/mnt/app/ko/mcp3021.ko` from there.
 - `nix/sdcard/default.nix` assembles the image (u-boot, uImage, dtb,
@@ -48,9 +49,9 @@ module iteration.
 
 ## Module iteration (fast path, proven)
 
-The goggle currently runs the **stock vendor firmware** (hostname `tina`,
-minimal busybox). Our modules built from `~/git/linux` load there too
-(vermagic `4.9.118 SMP preempt mod_unload ARMv7 thumb2 p2v8`).
+The goggle runs the **NixOS image** (hostname `hdzero`); modules built from
+`~/git/linux` load on it and on the stock vendor firmware (hostname `tina`),
+both use vermagic `4.9.118 SMP preempt mod_unload ARMv7 thumb2 p2v8`.
 
 ```bash
 nix develop .#kernel            # cross devshell (gcc 10, ARCH/CROSS_COMPILE set)
@@ -73,10 +74,13 @@ Gotchas:
 - Serial console only, no network. Use `scripts/goggle.py` (stdlib-only,
   opens `/dev/ttyUSB0` directly): subcommands `run`, `push`, `pull`,
   `deploy-ko`, `dmesg`. Interactive: `tio /dev/ttyUSB0`. One process per
-  port — stop tio before running goggle.py and vice versa.
-- Console prompt `root@tina:/#` (stock fw, autologin). NixOS image: root
-  password `openzero`.
-- File transfer happens through the console (printf/hexdump on the goggle's
-  minimal busybox), so it works on the stock firmware.
-- Stock fw loads the blob modules at boot; `rmmod` before insmodding a
-  replacement. On the NixOS image, `systemctl stop hdzero` first.
+  port — stop tio before running goggle.py and vice versa. Handles both the
+  stock busybox prompt and the NixOS bash prompt.
+- NixOS image: root password `openzero`, app runs as the `hdzero` systemd
+  service (`systemctl stop hdzero` before swapping modules, `journalctl -u
+  hdzero` for app logs). Run `dmesg -n 1` first, kernel log spam on the
+  console corrupts goggle.py output.
+- Stock fw: prompt `root@tina:/#`, autologin; the blob modules are loaded at
+  boot, `rmmod` before insmodding a replacement.
+- File transfer happens through the console (printf/hexdump), so it works
+  even on the stock firmware's minimal busybox.
