@@ -48,7 +48,7 @@ Run builds through pueue (slow). Full image: `nix build
 .#packages.x86_64-linux.sdcard-nixos` — only needed for flashing, not for
 module iteration.
 
-## Mainline kernel port (boot testing only)
+## Mainline kernel port (boots NixOS on the goggle)
 
 - Port lives on the `v536-port` branch of https://github.com/Mic92/linux
   (local checkout: `~/git/linux-v536`); status in `docs/mainline.md`.
@@ -61,7 +61,11 @@ module iteration.
   u-boot loads it and applies the env.cfg bootargs.
 - Minimal NixOS image on the mainline kernel: `nix build
   .#sdcard-nixos-mainline` (kernel package: `.#kernel-mainline-nixos`,
-  machine config: `machines/hdzero-mainline/`).
+  machine config: `machines/hdzero-mainline/`); root password "openzero",
+  serial console on uart0.
+- Hardware facts found during bring-up: AXP2101 PMIC is on RSB (hwaddr
+  0x3a3, runtime 0x2d), not I2C; RSB interrupt is GIC SPI 114 (BSP dts
+  says 140, wrong); top fan = i2c2 dev 0x64 reg 0x83 duty 0-100.
 
 ## Module iteration (fast path, proven)
 

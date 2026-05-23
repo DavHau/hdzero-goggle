@@ -56,6 +56,27 @@
     device = "/dev/mmcblk0p3";
   };
 
+  # The top fan controller (DM5680 companion MCU at 0x64 on the i2c2 bus,
+  # register 0x83 = duty 0-100) is normally driven by the goggle app.
+  # Without it the SoC has no airflow, so spin the fan at a fixed duty.
+  systemd.services.topfan = {
+    description = "Set top fan speed";
+    wantedBy = [ "multi-user.target" ];
+    serviceConfig.Type = "oneshot";
+    script = ''
+      for dev in /sys/bus/i2c/devices/i2c-*; do
+        case "$(readlink -f "$dev/of_node")" in
+        *i2c@5002800)
+          ${pkgs.i2c-tools}/bin/i2cset -y "''${dev##*-}" 0x64 0x83 41
+          exit 0
+          ;;
+        esac
+      done
+      echo "i2c2 bus not found" >&2
+      exit 1
+    '';
+  };
+
   services.openssh.enable = true;
   services.openssh.settings.PermitRootLogin = "yes";
   networking.firewall.enable = false;

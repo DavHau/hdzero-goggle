@@ -1,15 +1,17 @@
 # Mainline kernel port (Allwinner V536 / sun8iw16p1)
 
-Status: drivers written, untested on hardware. The port lives on the
+Status: boots NixOS on the goggle. The port lives on the
 `v536-port` branch of https://github.com/Mic92/linux (based on stable
 v7.0.9, 25 patches): machine support, PIO/R-PIO pinctrl, CCU + PRCM
 (sunxi-ng), DMA, SID efuse, thermal sensor + throttling, RTC (provides
-LOSC/IOSC), USB (phy + MUSB peripheral mode), AXP2101 PMIC (mfd +
+LOSC/IOSC), USB (phy + MUSB peripheral mode), AXP2101 PMIC over RSB (mfd +
 regulators), cpufreq (OPP 600-1104 MHz, DCDC2 supply), GPADC (RSSI input,
-not battery), and a devicetree with uart0, mmc0/1, i2c0-3 + R_I2C, spi0
-(FPGA flash), watchdog. Everything is compile-tested only; an adversarial
-review round against the BSP sources and the hardware register dumps fixed
-the known bugs (MMC clock gate, watchdog IRQ, i2c3 pins, MUSB endpoints).
+not battery), and a devicetree with uart0, mmc0/1, i2c0-3 + RSB, spi0
+(FPGA flash), watchdog. Verified on hardware: serial console, SD card
+rootfs, systemd + sshd, PMIC regulators, RTC, watchdog, thermal,
+SPI-NOR probe. Bring-up findings: the PMIC sits on the RSB bus (boot0
+switches it away from I2C) and the RSB interrupt is GIC SPI 114, not the
+140 claimed by the BSP devicetree.
 Build the flashable image with `nix build .#sdcard-nixos-mainline`
 (kernel package: `.#kernel-mainline-nixos`), or use
 `nix develop .#kernel-mainline` + `scripts/build-mainline-uimage.sh`
@@ -41,11 +43,12 @@ on partition 1, NixOS rootfs on partition 2, config FAT on partition 3).
 The DTB ships as `kernel.dtb` on the config FAT, not appended to the
 uImage (`nix/kernel-mainline-nixos/uimage.nix`).
 
-What works (expected): serial console, SD card, SSH over a USB network
-gadget once configured manually, I2C, watchdog, thermal, PMIC. What does
-not: display/VDPO, video pipeline (CSI/ISP/VE), audio, the goggle app and
-the xradio wifi — all of these need the vendor 4.9 stack. Untested on
-hardware so far; a boot test over uart0 is the next step.
+What works (verified on hardware): serial console, SD card rootfs,
+systemd + sshd, PMIC (AXP2101 over RSB) with regulators, watchdog,
+thermal, RTC, SPI-NOR probe, cpufreq. A `topfan` oneshot service spins
+the top fan at a fixed duty since the goggle app is not running. What
+does not: display/VDPO, video pipeline (CSI/ISP/VE), audio, the goggle
+app and the xradio wifi - all of these need the vendor 4.9 stack.
 
 Previous findings: Mainline has no V536 SoC support — only fallback
 compatibles for individual IP blocks ("allwinner,sun8i-v536-i2c",
@@ -66,10 +69,9 @@ consequence, not as the root cause.
 5. Still missing / open questions: SoC PWM driver (new multi-channel IP,
    no mainline match - but the goggle does not use it, the fan is on I2C
    0x64 / DM5680), audio codec, battery readout (external MCP3021 on I2C,
-   not the SoC GPADC), AXP2101 power-key IRQ polarity (vendor uses GIC SPI
-   104 level, needs hardware test), thermal calibration (efuse not burned),
-   config slimming, hardware boot test (nix packaging is done:
-   `.#sdcard-nixos-mainline`).
+   not the SoC GPADC), AXP2101 power-key/NMI interrupt (not wired up yet),
+   thermal calibration (efuse not burned), USB gadget test, config
+   slimming.
 6. Everything else (display/VDPO, CSI/ISP, video engine) is
    vendor-specific and a separate, much larger effort.
 
