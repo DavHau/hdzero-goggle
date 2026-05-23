@@ -12,10 +12,9 @@ cd "$KERNEL_DIR"
 export KBUILD_OUTPUT="$OUT"
 
 if [ ! -f "$OUT/.config" ]; then
-	make sunxi_defconfig
-	scripts/config --file "$OUT/.config" --enable ARM_APPENDED_DTB \
-		--enable MTD --enable MTD_SPI_NOR --enable SUN20I_GPADC
-	make olddefconfig
+	# Board defconfig from the v536-port branch (includes ARM_APPENDED_DTB,
+	# MTD_SPI_NOR, SUN20I_GPADC); same config the nix package uses.
+	make sun8i_v536_defconfig
 fi
 
 make -j"$(nproc)" zImage dtbs

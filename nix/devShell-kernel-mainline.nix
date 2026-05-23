@@ -28,6 +28,8 @@ mkShell {
     export ARCH=arm
     export CROSS_COMPILE=${stdenv.cc.targetPrefix}
     export KBUILD_BUILD_VERSION=1
+    export HOSTCFLAGS="-I${buildPackages.openssl.dev}/include"
+    export HOSTLDFLAGS="-L${buildPackages.openssl.out}/lib"
     echo "mainline kernel dev shell: ARCH=$ARCH CROSS_COMPILE=$CROSS_COMPILE"
   '';
 }

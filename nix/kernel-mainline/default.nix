@@ -8,24 +8,17 @@
 let
   version = "7.0.9-v536";
 
-  # Change this to "sun8i_v536_defconfig" once the dedicated defconfig
-  # lands on the v536-port branch.
-  defconfig = "sunxi_defconfig";
+  # Board-focused config from the v536-port branch.
+  defconfig = "sun8i_v536_defconfig";
 
-  # Extra options on top of defconfig (only needed while using
-  # sunxi_defconfig; drop when switching to sun8i_v536_defconfig).
-  extraConfig = [
-    "ARM_APPENDED_DTB"
-    "MTD"
-    "MTD_SPI_NOR"
-    "SUN20I_GPADC"
-  ];
+  # Extra options on top of the defconfig (none needed currently).
+  extraConfig = [ ];
 
   src = fetchFromGitHub {
     owner = "Mic92";
     repo = "linux";
-    rev = "a06268b5f072b72fc33cac4592ff02b9c831a9db";
-    hash = "sha256-LMes3luo/yha2+ssQ4NV0lnZDzFxtU5aqnxCF2T2bzc=";
+    rev = "729bc06239d54beb3c57801090dd7c0d88a958a7";
+    hash = "sha256-Og9LPA5XgxCoORsiBgAildDqdbookKq60mzUa1ZuY6o=";
   };
 
   dtbRelPath = "allwinner/sun8i-v536-hdzero-goggle.dtb";
@@ -61,10 +54,12 @@ stdenv.mkDerivation {
     export ARCH=arm
     export CROSS_COMPILE=${stdenv.cc.targetPrefix}
     export KBUILD_BUILD_VERSION=1
+    # UTS_VERSION embeds `date` unless this is set; keep the image reproducible.
+    export KBUILD_BUILD_TIMESTAMP="$(date -u -d "@$SOURCE_DATE_EPOCH")"
+    export KBUILD_BUILD_USER=nixbld
+    export KBUILD_BUILD_HOST=nixbld
     make ${defconfig}
-    ${builtins.concatStringsSep "\n" (
-      map (opt: "scripts/config --enable ${opt}") extraConfig
-    )}
+    ${builtins.concatStringsSep "\n" (map (opt: "scripts/config --enable ${opt}") extraConfig)}
     make olddefconfig
     runHook postConfigure
   '';

@@ -38,7 +38,8 @@ consequence, not as the root cause.
    0x64 / DM5680), audio codec, battery readout (external MCP3021 on I2C,
    not the SoC GPADC), AXP2101 power-key IRQ polarity (vendor uses GIC SPI
    104 level, needs hardware test), thermal calibration (efuse not burned),
-   config slimming, nix packaging, hardware boot test.
+   config slimming, hardware boot test (nix packaging is done:
+   `.#kernel-mainline`).
 6. Everything else (display/VDPO, CSI/ISP, video engine) is
    vendor-specific and a separate, much larger effort.
 

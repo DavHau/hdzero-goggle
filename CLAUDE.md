@@ -48,6 +48,16 @@ Run builds through pueue (slow). Full image: `nix build
 .#packages.x86_64-linux.sdcard-nixos` — only needed for flashing, not for
 module iteration.
 
+## Mainline kernel port (boot testing only)
+
+- Port lives on the `v536-port` branch of https://github.com/Mic92/linux
+  (local checkout: `~/git/linux-v536`); status in `docs/mainline.md`.
+- Reproducible uImage from the pinned source: `nix build .#kernel-mainline`
+  (`nix/kernel-mainline/default.nix`).
+- Iteration: `nix develop .#kernel-mainline` +
+  `scripts/build-mainline-uimage.sh` (uses `sun8i_v536_defconfig`,
+  KERNEL_DIR overrides the checkout path).
+
 ## Module iteration (fast path, proven)
 
 The goggle runs the **NixOS image** (hostname `hdzero`); modules built from
