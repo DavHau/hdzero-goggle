@@ -1,21 +1,25 @@
 # Mainline V536 kernel as a NixOS kernel package (linuxManualConfig).
-# Source pin shared with nix/kernel-mainline; board defconfig +
-# NixOS/systemd config fragment (nixos.config).
+# Board defconfig + NixOS/systemd config fragment (nixos.config).
 {
   lib,
   stdenv,
   buildPackages,
+  fetchFromGitHub,
   linuxManualConfig,
 
-  # from this project (shares the source pin)
-  kernel-mainline,
   # boot.kernelPackages overrides the kernel with extra arguments
   # (features, kernelPatches, randstructSeed); accept and ignore them
   # like nix/kernel does.
   ...
 }:
 let
-  inherit (kernel-mainline) src;
+  # Linux v7.0.9 + the V536/HDZero Goggle port (branch v536-port).
+  src = fetchFromGitHub {
+    owner = "Mic92";
+    repo = "linux";
+    rev = "729bc06239d54beb3c57801090dd7c0d88a958a7";
+    hash = "sha256-Og9LPA5XgxCoORsiBgAildDqdbookKq60mzUa1ZuY6o=";
+  };
 
   # sun8i_v536_defconfig expanded to a full .config plus the NixOS fragment.
   configfile = stdenv.mkDerivation {

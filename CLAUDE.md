@@ -52,11 +52,13 @@ module iteration.
 
 - Port lives on the `v536-port` branch of https://github.com/Mic92/linux
   (local checkout: `~/git/linux-v536`); status in `docs/mainline.md`.
-- Reproducible uImage from the pinned source: `nix build .#kernel-mainline`
-  (`nix/kernel-mainline/default.nix`).
+- NixOS kernel package from the pinned source: `nix build
+  .#kernel-mainline-nixos` (`nix/kernel-mainline-nixos/`).
 - Iteration: `nix develop .#kernel-mainline` +
   `scripts/build-mainline-uimage.sh` (uses `sun8i_v536_defconfig`,
-  KERNEL_DIR overrides the checkout path).
+  KERNEL_DIR overrides the checkout path). DTB is not appended: write
+  uImage to SD p1 and the dtb as `kernel.dtb` on the config FAT (p3);
+  u-boot loads it and applies the env.cfg bootargs.
 - Minimal NixOS image on the mainline kernel: `nix build
   .#sdcard-nixos-mainline` (kernel package: `.#kernel-mainline-nixos`,
   machine config: `machines/hdzero-mainline/`).

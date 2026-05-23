@@ -10,12 +10,15 @@ not battery), and a devicetree with uart0, mmc0/1, i2c0-3 + R_I2C, spi0
 (FPGA flash), watchdog. Everything is compile-tested only; an adversarial
 review round against the BSP sources and the hardware register dumps fixed
 the known bugs (MMC clock gate, watchdog IRQ, i2c3 pins, MUSB endpoints).
-Build with `nix build .#kernel-mainline` for a reproducible uImage from
-the pinned source, or use
+Build the flashable image with `nix build .#sdcard-nixos-mainline`
+(kernel package: `.#kernel-mainline-nixos`), or use
 `nix develop .#kernel-mainline` + `scripts/build-mainline-uimage.sh`
 (KERNEL_DIR points to a local checkout of that branch) for iterative
-development. Boot via the vendor u-boot (`loady` + `bootm`, or repack
-the SD image).
+development. The vendor boot chain is kept; u-boot loads the kernel
+from partition 1 and the devicetree from the config FAT partition
+(`kernel.dtb`) and applies the bootargs from env.cfg to it (the BSP
+u-boot ignores bootm's fdt argument, so the image overwrites the
+staging buffer at 0x7cfd1b20 in boot_normal).
 
 ## NixOS image with the mainline kernel
 
@@ -66,7 +69,7 @@ consequence, not as the root cause.
    not the SoC GPADC), AXP2101 power-key IRQ polarity (vendor uses GIC SPI
    104 level, needs hardware test), thermal calibration (efuse not burned),
    config slimming, hardware boot test (nix packaging is done:
-   `.#kernel-mainline`).
+   `.#sdcard-nixos-mainline`).
 6. Everything else (display/VDPO, CSI/ISP, video engine) is
    vendor-specific and a separate, much larger effort.
 

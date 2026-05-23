@@ -194,14 +194,9 @@
           inherit minIni-src;
         };
 
-        # mainline kernel (v7.0.9 + V536 port) — boot-test uImage only
-        kernel-mainline = pkgsArm.callPackage ./nix/kernel-mainline { };
-
-        # mainline kernel as a NixOS kernel package (linuxManualConfig,
-        # board defconfig + NixOS/systemd config fragment)
-        kernel-mainline-nixos = pkgsArm.callPackage ./nix/kernel-mainline-nixos {
-          inherit (self.packages.${system}) kernel-mainline;
-        };
+        # mainline kernel (v7.0.9 + V536 port) as a NixOS kernel package
+        # (linuxManualConfig, board defconfig + NixOS/systemd config fragment)
+        kernel-mainline-nixos = pkgsArm.callPackage ./nix/kernel-mainline-nixos { };
 
         # uImage built from the NixOS mainline kernel for the sdcard image
         kernel-mainline-nixos-uimage = pkgsArm.callPackage ./nix/kernel-mainline-nixos/uimage.nix {
