@@ -1,4 +1,5 @@
 {
+  lib,
   stdenv,
   dos2unix,
   e2tools,
@@ -18,6 +19,11 @@
 
   # customization
   init ? "/init",
+  # Optional DTB for the config FAT partition. When set, boot_normal
+  # overwrites boot0's staged fdt at 0x7cfd1b20 with it before bootm,
+  # so u-boot applies the env.cfg bootargs to our devicetree. Used by
+  # the mainline image; the vendor kernel uses boot0's built-in DTB.
+  bootDtb ? null,
 }:
 let
   # dtbDir = "${os-images}/images";
@@ -34,6 +40,14 @@ let
   uImage = "${kernel}/uImage";
   env_cfg = writeText "env.cfg" (import ./env.cfg.nix {
     inherit init;
+    # The BSP u-boot ignores bootm's fdt argument and 'fdt addr'; it
+    # always uses the DTB boot0 staged at 0x7cfd1b20. Overwrite that
+    # buffer with ours so u-boot applies env.cfg bootargs to it.
+    bootNormal =
+      if bootDtb == null then
+        "sunxi_flash read 45000000 boot;bootm 45000000"
+      else
+        "fatload mmc 0:3 46000000 kernel.dtb;cp.b 46000000 7cfd1b20 \${filesize};sunxi_flash read 45000000 boot;bootm 45000000";
   });
 in
 stdenv.mkDerivation {
@@ -116,6 +130,9 @@ stdenv.mkDerivation {
     fallocate -l 16M config.fat32
     mformat -v  oz-config -i config.fat32 ::
     mcopy -i config.fat32 ${./setting.ini} ::/setting.ini
+    ${lib.optionalString (bootDtb != null) ''
+      mcopy -i config.fat32 ${bootDtb} ::/kernel.dtb
+    ''}
 
     BUILD_DIR="$PWD" \
       bash ${./genimage.sh} -c "${./genimage.cfg}"

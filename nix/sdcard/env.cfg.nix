@@ -1,5 +1,7 @@
 {
   init ? "/init",
+  # boot_normal u-boot commands. Default: vendor-style uImage boot.
+  bootNormal ? "sunxi_flash read 45000000 boot;bootm 45000000",
 }:
 ''
 initcall_debug=0
@@ -18,7 +20,7 @@ setargs_nor=setenv bootargs earlycon=''${earlycon} initcall_debug=''${initcall_d
 setargs_nand=setenv bootargs earlycon=''${earlycon} initcall_debug=''${initcall_debug} console=''${console} loglevel=''${loglevel} root=''${nand_root} init=''${init} partitions=''${partitions} cma=''${cma} ion_carveout_list=''${ion_carveout_list}
 setargs_mmc=setenv bootargs earlycon=''${earlycon} initcall_debug=''${initcall_debug} console=''${console} loglevel=''${loglevel} root=''${mmc_root} init=''${init} partitions=''${partitions} cma=''${cma} ion_carveout_list=''${ion_carveout_list} rootwait
 
-boot_normal=sunxi_flash read 45000000 boot;bootm 45000000
+boot_normal=${bootNormal}
 boot_recovery=sunxi_flash read 45000000 recovery;bootm 45000000 recovery
 
 bootdelay=5

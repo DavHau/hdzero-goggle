@@ -221,6 +221,7 @@
           inherit hdzero-goggle-buildroot;
           inherit (self.packages.${system}) hdzero-goggle-tools;
           kernel = self.packages.${system}.kernel-mainline-nixos-uimage;
+          bootDtb = "${self.packages.${system}.kernel-mainline-nixos-uimage}/sun8i-v536-hdzero-goggle.dtb";
           goggle-app = self.packages.${system}.goggle-app-nix;
           rootfs = self.packages.${system}.rootfs-nixos-mainline;
           init = "/init";
