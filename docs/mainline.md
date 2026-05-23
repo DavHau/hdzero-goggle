@@ -10,10 +10,12 @@ not battery), and a devicetree with uart0, mmc0/1, i2c0-3 + R_I2C, spi0
 (FPGA flash), watchdog. Everything is compile-tested only; an adversarial
 review round against the BSP sources and the hardware register dumps fixed
 the known bugs (MMC clock gate, watchdog IRQ, i2c3 pins, MUSB endpoints).
-Build with
+Build with `nix build .#kernel-mainline` for a reproducible uImage from
+the pinned source, or use
 `nix develop .#kernel-mainline` + `scripts/build-mainline-uimage.sh`
-(KERNEL_DIR points to a local checkout of that branch), boot via the
-vendor u-boot (`loady` + `bootm`, or repack the SD image).
+(KERNEL_DIR points to a local checkout of that branch) for iterative
+development. Boot via the vendor u-boot (`loady` + `bootm`, or repack
+the SD image).
 
 Previous findings: Mainline has no V536 SoC support — only fallback
 compatibles for individual IP blocks ("allwinner,sun8i-v536-i2c",

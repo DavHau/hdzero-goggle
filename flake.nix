@@ -193,6 +193,9 @@
         ini-read = pkgsArm.callPackage ./packages/ini-read {
           inherit minIni-src;
         };
+
+        # mainline kernel (v7.0.9 + V536 port) — boot-test uImage only
+        kernel-mainline = pkgsArm.callPackage ./nix/kernel-mainline { };
       };
 
       # check all packages in CI-pipeline
