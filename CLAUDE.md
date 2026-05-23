@@ -57,6 +57,9 @@ module iteration.
 - Iteration: `nix develop .#kernel-mainline` +
   `scripts/build-mainline-uimage.sh` (uses `sun8i_v536_defconfig`,
   KERNEL_DIR overrides the checkout path).
+- Minimal NixOS image on the mainline kernel: `nix build
+  .#sdcard-nixos-mainline` (kernel package: `.#kernel-mainline-nixos`,
+  machine config: `machines/hdzero-mainline/`).
 
 ## Module iteration (fast path, proven)
 

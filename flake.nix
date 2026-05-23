@@ -196,6 +196,35 @@
 
         # mainline kernel (v7.0.9 + V536 port) — boot-test uImage only
         kernel-mainline = pkgsArm.callPackage ./nix/kernel-mainline { };
+
+        # mainline kernel as a NixOS kernel package (linuxManualConfig,
+        # board defconfig + NixOS/systemd config fragment)
+        kernel-mainline-nixos = pkgsArm.callPackage ./nix/kernel-mainline-nixos {
+          inherit (self.packages.${system}) kernel-mainline;
+        };
+
+        # uImage built from the NixOS mainline kernel for the sdcard image
+        kernel-mainline-nixos-uimage = pkgsArm.callPackage ./nix/kernel-mainline-nixos/uimage.nix {
+          kernel = self.packages.${system}.kernel-mainline-nixos;
+        };
+
+        # nixos rootfs for the mainline kernel variant
+        rootfs-nixos-mainline = pkgsArm.callPackage ./nix/rootfs-nixos {
+          inherit nix-filter;
+          kernel = self.packages.${system}.kernel-mainline-nixos;
+          goggle-app = self.packages.${system}.goggle-app-nix;
+          machine = self.nixosConfigurations.hdzero-mainline;
+        };
+
+        # sdcard image with the mainline kernel + minimal nixos system
+        sdcard-nixos-mainline = pkgs.callPackage ./nix/sdcard {
+          inherit hdzero-goggle-buildroot;
+          inherit (self.packages.${system}) hdzero-goggle-tools;
+          kernel = self.packages.${system}.kernel-mainline-nixos-uimage;
+          goggle-app = self.packages.${system}.goggle-app-nix;
+          rootfs = self.packages.${system}.rootfs-nixos-mainline;
+          init = "/init";
+        };
       };
 
       # check all packages in CI-pipeline
@@ -231,6 +260,20 @@
             nixpkgs.pkgs = pkgsArm;
             nixpkgs.system = "armv7l-linux";
             imports = [ ./machines/hdzero/configuration.nix ];
+          }
+        ];
+      };
+
+      # minimal variant on the mainline kernel (no vendor video stack)
+      nixosConfigurations.hdzero-mainline = lib.nixosSystem {
+        specialArgs = {
+          packages = self.packages.${system};
+        };
+        modules = [
+          {
+            nixpkgs.pkgs = pkgsArm;
+            nixpkgs.system = "armv7l-linux";
+            imports = [ ./machines/hdzero-mainline/configuration.nix ];
           }
         ];
       };

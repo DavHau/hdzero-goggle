@@ -17,6 +17,33 @@ the pinned source, or use
 development. Boot via the vendor u-boot (`loady` + `bootm`, or repack
 the SD image).
 
+## NixOS image with the mainline kernel
+
+The mainline kernel is also packaged as a real NixOS kernel
+(`nix build .#kernel-mainline-nixos`, `nix/kernel-mainline-nixos/`): the
+board defconfig is expanded to a full `.config` and merged with a small
+NixOS/systemd fragment (`nixos.config`: CRYPTO_HMAC/SHA256, TMPFS_XATTR,
+namespaces, ext4 ACL/security xattrs, loop, /proc/config.gz). The
+`hdzero-mainline` nixosConfiguration
+(`machines/hdzero-mainline/configuration.nix`) uses it via
+`boot.kernelPackages` and drops everything vendor specific (goggle app,
+hdzero/xradio kernel modules, sunxi_dump pokes); what remains is a serial
+console getty, sshd and basic tools. There is no initrd
+(`boot.initrd.enable = false`), the kernel mounts root=/dev/mmcblk0p2
+directly like the product image.
+
+Build the SD card image with `nix build .#sdcard-nixos-mainline`; the
+layout is identical to the product image (vendor boot0 + u-boot, uImage
+on partition 1, NixOS rootfs on partition 2, config FAT on partition 3).
+The DTB ships as `kernel.dtb` on the config FAT, not appended to the
+uImage (`nix/kernel-mainline-nixos/uimage.nix`).
+
+What works (expected): serial console, SD card, SSH over a USB network
+gadget once configured manually, I2C, watchdog, thermal, PMIC. What does
+not: display/VDPO, video pipeline (CSI/ISP/VE), audio, the goggle app and
+the xradio wifi — all of these need the vendor 4.9 stack. Untested on
+hardware so far; a boot test over uart0 is the next step.
+
 Previous findings: Mainline has no V536 SoC support — only fallback
 compatibles for individual IP blocks ("allwinner,sun8i-v536-i2c",
 "...-mbus" referenced by H616/A100/D1). The earlier 6.12 boot attempt
