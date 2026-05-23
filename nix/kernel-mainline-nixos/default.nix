@@ -17,8 +17,8 @@ let
   src = fetchFromGitHub {
     owner = "Mic92";
     repo = "linux";
-    rev = "729bc06239d54beb3c57801090dd7c0d88a958a7";
-    hash = "sha256-Og9LPA5XgxCoORsiBgAildDqdbookKq60mzUa1ZuY6o=";
+    rev = "94540fcd10a892ac6e2998b4213f7a1e57dc0bd0";
+    hash = "sha256-LoNvIQJNHqURnPSpI9xS1iMb+0LLX1tOS8YnivNCIMk=";
   };
 
   # sun8i_v536_defconfig expanded to a full .config plus the NixOS fragment.
