@@ -8,6 +8,14 @@
   packages,
   ...
 }:
+let
+  armbianFirmware = pkgs.fetchFromGitHub {
+    owner = "armbian";
+    repo = "firmware";
+    rev = "4050e02da2dce2b74c97101f7964ecfb962f5aec";
+    hash = "sha256-wc4xyNtUlONntofWJm8/w0KErJzXKHijOyh9hAYTCoU=";
+  };
+in
 {
   networking.hostName = "hdzero-mainline";
 
@@ -42,6 +50,19 @@
   boot.loader.grub.enable = false;
   boot.initrd.enable = false;
   boot.kernelPackages = pkgs.linuxPackagesFor packages.kernel-mainline-nixos;
+  boot.extraModulePackages = [
+    (packages.xradio-mainline.override { kernel = config.boot.kernelPackages.kernel; })
+  ];
+
+  # XR819 firmware (Armbian blobs: boot_xr819.bin, fw_xr819.bin, sdd_xr819.bin)
+  hardware.firmware = [
+    (pkgs.runCommand "xr819-firmware" { } ''
+      mkdir -p $out/lib/firmware
+      cp -r ${armbianFirmware}/xr819 $out/lib/firmware/xr819
+    '')
+  ];
+
+  networking.wireless.enable = true;
 
   # TODO: disable kernel instead of overriding initrd with garbage
   system.build.initialRamdisk = "foo";

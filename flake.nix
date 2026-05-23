@@ -197,6 +197,9 @@
         # mainline kernel (v7.0.9 + V536 port) as a NixOS kernel package
         # (linuxManualConfig, board defconfig + NixOS/systemd config fragment)
         kernel-mainline-nixos = pkgsArm.callPackage ./nix/kernel-mainline-nixos { };
+        xradio-mainline = pkgsArm.callPackage ./nix/xradio {
+          kernel = self.packages.${system}.kernel-mainline-nixos;
+        };
 
         # uImage built from the NixOS mainline kernel for the sdcard image
         kernel-mainline-nixos-uimage = pkgsArm.callPackage ./nix/kernel-mainline-nixos/uimage.nix {
