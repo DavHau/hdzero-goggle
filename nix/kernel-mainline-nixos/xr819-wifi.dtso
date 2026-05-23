@@ -1,0 +1,51 @@
+/*
+ * Devicetree overlay: XR819 wifi on SDIO (mmc1), PG0-PG5.
+ *
+ * Power sequencing via mmc-pwrseq-simple:
+ *   wlan_regon = PG8, active-low reset
+ *   wlan_hostwake = PG9, active-high edge interrupt
+ *
+ * Hardware facts from docs/hw-reference/{gpio,dmesg-boot,pinmux-pins}-4.9.txt
+ * and the vendor sunxi-wlan platform driver log.
+ */
+/dts-v1/;
+/plugin/;
+
+/ {
+	compatible = "hdzero,goggle", "allwinner,sun8i-v536";
+};
+
+&{/} {
+	wifi_pwrseq: wifi-pwrseq {
+		compatible = "mmc-pwrseq-simple";
+		reset-gpios = <&pio 6 8 1>; /* PG8, GPIO_ACTIVE_LOW */
+	};
+};
+
+&pio {
+	mmc1_pins: mmc1-pins {
+		pins = "PG0", "PG1", "PG2", "PG3", "PG4", "PG5";
+		function = "sdc1";
+		drive-strength = <30>;
+		bias-pull-up;
+	};
+};
+
+&mmc1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&mmc1_pins>;
+	vmmc-supply = <&reg_dcdc1>;
+	bus-width = <4>;
+	non-removable;
+	keep-power-in-suspend;
+	mmc-pwrseq = <&wifi_pwrseq>;
+	status = "okay";
+
+	xr819: wifi@1 {
+		reg = <1>;
+		compatible = "xradio,xr819";
+		interrupt-parent = <&pio>;
+		interrupts = <6 9 1>; /* PG9, IRQ_TYPE_EDGE_RISING */
+		interrupt-names = "host-wake";
+	};
+};

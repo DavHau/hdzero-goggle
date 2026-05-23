@@ -4,9 +4,8 @@
   lib,
   stdenv,
   buildPackages,
-  fetchFromGitHub,
+  
   linuxManualConfig,
-
   # boot.kernelPackages overrides the kernel with extra arguments
   # (features, kernelPatches, randstructSeed); accept and ignore them
   # like nix/kernel does.
@@ -14,18 +13,15 @@
 }:
 let
   # Linux v7.0.9 + the V536/HDZero Goggle port (branch v536-port).
-  src = fetchFromGitHub {
-    owner = "Mic92";
-    repo = "linux";
-    rev = "94540fcd10a892ac6e2998b4213f7a1e57dc0bd0";
-    hash = "sha256-LoNvIQJNHqURnPSpI9xS1iMb+0LLX1tOS8YnivNCIMk=";
+  src = builtins.fetchGit {
+    url = "file:///home/joerg/git/linux";
+    ref = "v536-port";
+    rev = "aebf8705c1594434ad17f699cbdc9fda20fa4a1a";
   };
-
   # sun8i_v536_defconfig expanded to a full .config plus the NixOS fragment.
   configfile = stdenv.mkDerivation {
     name = "sun8i-v536-nixos-kernel-config";
     inherit src;
-
     depsBuildBuild = [ buildPackages.stdenv.cc ];
     nativeBuildInputs = with buildPackages; [
       bc
@@ -33,11 +29,9 @@ let
       flex
       perl
     ];
-
     postPatch = ''
       patchShebangs scripts/
     '';
-
     buildPhase = ''
       runHook preBuild
       export ARCH=arm
@@ -47,7 +41,6 @@ let
       make olddefconfig
       runHook postBuild
     '';
-
     installPhase = ''
       runHook preInstall
       cp .config $out
